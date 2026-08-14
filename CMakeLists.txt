@@ -22,7 +22,8 @@ include(FetchContent)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 
-set(USE_LIBRESSL OFF CACHE BOOL "" FORCE)
+set(ASIOTPL_USE_BOOST OFF CACHE BOOL "" FORCE)
+set(SIO_USE_OPENSSL OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     socketio
@@ -38,5 +39,4 @@ setup_geode_mod(dashchat
         src/ChatUI.cpp
 )
 
-# Target link
 target_link_libraries(dashchat PRIVATE sio_client)

@@ -2,6 +2,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include "ChatManager.hpp"
 #include "ChatPopup.hpp"
+#include <sio_client.h>
 
 using namespace geode::prelude;
 
