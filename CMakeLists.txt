@@ -9,6 +9,17 @@ project(dashchat LANGUAGES CXX)
 
 if(DEFINED ENV{GEODE_SDK})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
+    include("$ENV{GEODE_SDK}/share/Geode/cmake/GeodeFile.cmake" OPTIONAL)
+endif()
+
+if(NOT TARGET Geode)
+    include(FetchContent)
+    FetchContent_Declare(
+        GeodeSDK
+        GIT_REPOSITORY https://github.com/geode-sdk/geode.git
+        GIT_TAG v3.8.0 
+    )
+    FetchContent_MakeAvailable(GeodeSDK)
 endif()
 
 find_package(Geode REQUIRED)
