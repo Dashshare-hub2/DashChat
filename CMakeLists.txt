@@ -5,12 +5,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
-if(DEFINED ENV{GEODE_SDK} AND NOT Geode_DIR)
-    set(Geode_DIR "$ENV{GEODE_SDK}")
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
+if(NOT DEFINED ENV{GEODE_SDK})
+    message(FATAL_ERROR "GEODE_SDK environment variable is not set! Please install Geode SDK.")
 endif()
 
-find_package(Geode REQUIRED)
+include("$ENV{GEODE_SDK}/share/Geode/cmake/Geode.cmake")
 
 include(FetchContent)
 
@@ -25,7 +24,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
-add_geode_mod(dashchat
+setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
