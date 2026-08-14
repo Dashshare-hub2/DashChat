@@ -7,6 +7,8 @@ project(dashchat LANGUAGES CXX)
 
 if(DEFINED ENV{GEODE_SDK})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}/share/Geode/cmake")
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}/lib/cmake/Geode")
 endif()
 
 find_package(Geode REQUIRED)
@@ -23,6 +25,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
+# Khai báo Geode Mod
 setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
