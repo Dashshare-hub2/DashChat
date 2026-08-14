@@ -11,24 +11,30 @@ set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
 
 find_program(GEODE_CLI geode PATHS "${CMAKE_SOURCE_DIR}/my-epic-geode-cli")
 
-if(GEODE_CLI AND DEFINED ENV{GEODE_SDK})
-    message(STATUS "Configuring Geode CLI SDK path to: $ENV{GEODE_SDK}")
+if(DEFINED ENV{GEODE_SDK})
+    set(TARGET_GEODE_SDK "$ENV{GEODE_SDK}")
+else()
+    set(TARGET_GEODE_SDK "${CMAKE_SOURCE_DIR}/geode-sdk-clone")
+endif()
+
+if(GEODE_CLI)
+    message(STATUS "Configuring Geode CLI SDK path to: ${TARGET_GEODE_SDK}")
     
     execute_process(
-        COMMAND "${GEODE_CLI}" sdk set-path "$ENV{GEODE_SDK}"
-        RESULT_VARIABLE GEODE_SET_RES
+        COMMAND "${GEODE_CLI}" sdk set-path "${TARGET_GEODE_SDK}"
     )
     
     execute_process(
         COMMAND "${GEODE_CLI}" sdk install-binaries
-        RESULT_VARIABLE GEODE_CLI_RES
     )
-    
-    set(GEODE_SDK_PATH "$ENV{GEODE_SDK}" CACHE PATH "" FORCE)
 endif()
 
-if(DEFINED ENV{GEODE_SDK})
-    add_subdirectory("$ENV{GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
+set(ENV{GEODE_SDK} "${TARGET_GEODE_SDK}")
+set(GEODE_SDK_PATH "${TARGET_GEODE_SDK}" CACHE PATH "Path to Geode SDK" FORCE)
+set(GEODE_SDK "${TARGET_GEODE_SDK}" CACHE PATH "Path to Geode SDK" FORCE)
+
+if(EXISTS "${TARGET_GEODE_SDK}/CMakeLists.txt")
+    add_subdirectory("${TARGET_GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
 else()
     find_package(Geode REQUIRED)
 endif()
