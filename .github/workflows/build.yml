@@ -1,18 +1,11 @@
-name: Build Chat Mod
+name: Build Geode Mod
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
-      - master
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
+    branches: [ "main", "master" ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,20 +14,11 @@ jobs:
       matrix:
         config:
           - name: Windows
-            os: windows-2022
-
-          - name: Android32
-            os: ubuntu-22.04
-            target: Android32
-
-          - name: Android64
-            os: ubuntu-22.04
-            target: Android64
-
+            os: windows-latest
           - name: macOS
-            os: macos-14
+            os: macos-latest
 
-    name: ${{ matrix.config.name }}
+    name: Build ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
 
     steps:
@@ -46,21 +30,4 @@ jobs:
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          target: ${{ matrix.config.target }}
-          combine: true
-
-  package:
-    name: Package Mod (.geode)
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Package Multi-platform Mod
-        uses: geode-sdk/build-geode-mod/combine@main
-        with:
-          output: "DashChat.geode"
-
-      - name: Upload Mod Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DashChat-Geode-Mod
-          path: DashChat.geode
+          sdk: nightly

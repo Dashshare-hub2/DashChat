@@ -1,28 +1,16 @@
-
-#include <sio_client.h>
-
-#ifdef WIN32
-    #undef ERROR
-    #undef OPTIONAL
-    #undef DELETE
-    #undef min
-    #undef max
-    #undef BYTE
-#endif
-
 #include "ChatManager.hpp"
+#include <ixwebsocket/IXWebSocket.h>
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
 ChatManager::ChatManager() {
-    m_client = std::make_unique<sio::client>();
+    m_webSocket = std::make_unique<ix::WebSocket>();
 }
 
 ChatManager::~ChatManager() {
-    if (m_client) {
-        m_client->sync_close();
-        m_client->clear_con_listeners();
+    if (m_webSocket) {
+        m_webSocket->stop();
     }
 }
 
@@ -31,53 +19,106 @@ ChatManager* ChatManager::get() {
     return &instance;
 }
 
-void ChatManager::connect(const std::string& serverUrl) {
-    if (m_connected) return;
+void ChatManager::connect() {
+    bool enabled = Mod::get()->getSettingValue<bool>("enable-chat");
+    if (!enabled || m_connected) return;
 
-    m_client->set_open_listener([this]() {
-        m_connected = true;
-        log::info("Connected to DashChat server!");
-    });
+    std::string serverUrl = Mod::get()->getSettingValue<std::string>("server-url");
+    m_webSocket->setUrl(serverUrl);
 
-    m_client->set_close_listener([this](sio::client::close_reason const& reason) {
-        m_connected = false;
-        log::info("Disconnected from DashChat server.");
-    });
+    m_webSocket->setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
+        if (msg->type == ix::WebSocketMessageType::Open) {
+            m_connected = true;
+            log::info("Connected to DashChat server!");
+            
+            // Lấy Invite Code từ Mod Settings và tự động tham gia
+            std::string code = Mod::get()->getSettingValue<std::string>("invite-code");
+            joinWithInvite(code);
+        } 
+        else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
+            m_connected = false;
+            m_joined = false;
+            log::error("WebSocket Error/Close: {}", msg->errorInfo.reason);
+        } 
+        else if (msg->type == ix::WebSocketMessageType::Message) {
+            auto parseResult = matjson::parse(msg->str);
+            if (!parseResult.is_ok()) return;
 
-    m_client->set_fail_listener([this]() {
-        m_connected = false;
-        log::error("Failed to connect to DashChat server.");
-    });
+            auto json = parseResult.unwrap();
+            std::string type = json["type"].as_string();
 
-    m_client->socket()->on("chat_message", sio::socket::event_listener_aux([this](std::string const& name, sio::message::ptr const& data, bool hasAck, sio::message::list &ack_resp) {
-        if (data && data->get_flag() == sio::message::flag_object) {
-            auto obj = data->get_map();
-            if (obj.find("sender") != obj.end() && obj.find("message") != obj.end()) {
-                std::string sender = obj["sender"]->get_string();
-                std::string message = obj["message"]->get_string();
+            if (type == "join_success") {
+                m_joined = true;
+                std::string notice = json["message"].as_string();
+                Loader::get()->queueInMainThread([notice]() {
+                    Notification::create(notice, NotificationIcon::Success)->show();
+                });
+            }
+            else if (type == "chat_message") {
+                std::string sender = json["sender"].as_string();
+                std::string discordUser = json.contains("discordUser") && !json["discordUser"].is_null() 
+                                         ? json["discordUser"].as_string() : "";
+                std::string message = json["message"].as_string();
 
-                Loader::get()->queueInMainThread([this, sender, message]() {
-                    m_messages.push_back({sender, message});
+                Loader::get()->queueInMainThread([this, sender, discordUser, message]() {
+                    m_messages.push_back({sender, discordUser, message});
+                });
+            }
+            else if (type == "error") {
+                std::string err = json["message"].as_string();
+                Loader::get()->queueInMainThread([err]() {
+                    Notification::create(err, NotificationIcon::Error)->show();
                 });
             }
         }
-    }));
+    });
 
-    m_client->connect(serverUrl);
+    m_webSocket->start();
 }
 
 void ChatManager::disconnect() {
-    if (m_client && m_connected) {
-        m_client->close();
+    if (m_webSocket && m_connected) {
+        m_webSocket->stop();
         m_connected = false;
+        m_joined = false;
     }
 }
 
+void ChatManager::joinWithInvite(const std::string& inviteCode) {
+    if (!m_connected) return;
+
+    std::string gdName = GJAccountManager::get()->m_username.empty() 
+                         ? "Player" 
+                         : GJAccountManager::get()->m_username.c_str();
+
+    matjson::Value json;
+    json["type"] = "join_invite";
+    json["inviteCode"] = inviteCode;
+    json["gdName"] = gdName;
+
+    m_webSocket->send(json.dump());
+}
+
+void ChatManager::linkDiscord(const std::string& discordUsername, const std::string& discordId) {
+    if (!m_connected) return;
+
+    std::string gdName = GJAccountManager::get()->m_username.c_str();
+
+    matjson::Value json;
+    json["type"] = "link_discord";
+    json["gdName"] = gdName;
+    json["discordUsername"] = discordUsername;
+    json["discordId"] = discordId;
+
+    m_webSocket->send(json.dump());
+}
+
 void ChatManager::sendMessage(const std::string& msg) {
-    if (!m_connected || !m_client) return;
+    if (!m_connected || !m_joined) return;
 
-    sio::message::ptr pack = sio::object_message::create();
-    pack->get_map()["message"] = sio::string_message::create(msg);
+    matjson::Value json;
+    json["type"] = "chat_message";
+    json["message"] = msg;
 
-    m_client->socket()->emit("send_message", pack);
+    m_webSocket->send(json.dump());
 }
