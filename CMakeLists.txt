@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
+if(DEFINED ENV{GEODE_SDK} AND NOT Geode_DIR)
+    set(Geode_DIR "$ENV{GEODE_SDK}")
+endif()
+
 find_package(Geode REQUIRED)
 
 include(FetchContent)
@@ -18,7 +22,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
-add_geode_mod(Dashdhat
+add_geode_mod(dashchat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp

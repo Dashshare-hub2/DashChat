@@ -1,9 +1,23 @@
 {
-  "geode": "5.9.0",
-  "id": "daianhnguyen.dashchat",
-  "name": "DashChat Global",
-  "version": "v1.0.0",
-  "developer": "daianhnguyen",
-  "description": "Real-time global & private 6-digit chat connected with Discord OAuth2.",
-  "dependencies": []
-}
+    "id": "daianhnguyen.dashchat",
+    "name": "DashChat",
+    "developer": "daianhnguyen",
+    "geode": "5.9.0",
+    "version": "v1.0.0",
+    "gd": {
+        "win": "2.2081",
+        "android": "2.2081",
+        "mac": "2.2081",
+        "ios": "2.2081"
+    },
+    "description": "Feature-rich multiplayer mod",
+    "dependencies": {},
+    "incompatibilities": {},
+    "links": {
+        "homepage": "https://dashshare.pages.dev",
+        "source": "https://github.com/Dashshare-hub2/DashChat",
+        "community": "https://discord.gg"
+    },
+    "tags": [
+        "online"
+    ]
