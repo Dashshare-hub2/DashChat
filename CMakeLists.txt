@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
-ư
+
 set(GEODE_DONT_LINK_LOADER ON CACHE BOOL "Disable linking loader binary" FORCE)
 set(GEODE_LINK_NIGHTLY ON CACHE BOOL "Link nightly binaries" FORCE)
 
@@ -29,12 +29,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
-setup_geode_mod(dashchat
-    SOURCES
-        src/main.cpp
-        src/ChatManager.cpp
-)
-
 target_link_libraries(dashchat PRIVATE ixwebsocket)
 
 if(MSVC)
@@ -42,3 +36,9 @@ if(MSVC)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(dashchat PRIVATE -Wall -Wextra -Wno-unused-parameter)
 endif()
+
+setup_geode_mod(dashchat
+    SOURCES
+        src/main.cpp
+        src/ChatManager.cpp
+)
