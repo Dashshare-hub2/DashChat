@@ -18,20 +18,19 @@ else()
 endif()
 
 if(GEODE_CLI)
-    message(STATUS "Configuring Geode CLI SDK path to: ${TARGET_GEODE_SDK}")
-    
-    execute_process(
-        COMMAND "${GEODE_CLI}" sdk set-path "${TARGET_GEODE_SDK}"
-    )
-    
-    execute_process(
-        COMMAND "${GEODE_CLI}" sdk install-binaries
-    )
+    message(STATUS "Setting Geode CLI path to: ${TARGET_GEODE_SDK}")
+    execute_process(COMMAND "${GEODE_CLI}" sdk set-path "${TARGET_GEODE_SDK}")
+    execute_process(COMMAND "${GEODE_CLI}" sdk install-binaries)
 endif()
 
 set(ENV{GEODE_SDK} "${TARGET_GEODE_SDK}")
 set(GEODE_SDK_PATH "${TARGET_GEODE_SDK}" CACHE PATH "Path to Geode SDK" FORCE)
-set(GEODE_SDK "${TARGET_GEODE_SDK}" CACHE PATH "Path to Geode SDK" FORCE)
+
+if(APPLE)
+    set(GEODE_LOADER_PATH "${TARGET_GEODE_SDK}/bin/Geode.dylib" CACHE PATH "" FORCE)
+elseif(WIN32)
+    set(GEODE_LOADER_PATH "${TARGET_GEODE_SDK}/bin/Geode.dll" CACHE PATH "" FORCE)
+endif()
 
 if(EXISTS "${TARGET_GEODE_SDK}/CMakeLists.txt")
     add_subdirectory("${TARGET_GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
