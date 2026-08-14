@@ -1,17 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 
-if(POLICY CMP0169)
-    cmake_policy(SET CMP0169 OLD)
-endif()
-
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
-
-set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
 
 if(DEFINED ENV{GEODE_SDK})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
@@ -41,6 +35,7 @@ FetchContent_Declare(
     GIT_TAG 3.1.0
 )
 FetchContent_MakeAvailable(socketio)
+
 
 setup_geode_mod(dashchat
     SOURCES

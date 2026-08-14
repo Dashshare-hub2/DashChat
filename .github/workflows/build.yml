@@ -42,21 +42,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          
-      - name: Install Geode Binaries
-        run: |
-          geode sdk install-binaries || true
 
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
           target: ${{ matrix.config.target }}
-          combine: true
-
-      - name: Build Geode Mod
-        uses: geode-sdk/build-geode-mod@main
-        with:
-          target: ${{ matrix.config.target }}
+          sdk: v5.9.0
           combine: true
 
   package:
