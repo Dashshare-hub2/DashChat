@@ -45,7 +45,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
-ư
 setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
