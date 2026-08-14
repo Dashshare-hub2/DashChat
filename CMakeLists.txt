@@ -11,15 +11,18 @@ set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
 
 find_program(GEODE_CLI geode PATHS "${CMAKE_SOURCE_DIR}/my-epic-geode-cli")
 
-if(GEODE_CLI)
-    message(STATUS "Found Geode CLI at ${GEODE_CLI}, installing binaries...")
+if(GEODE_CLI AND DEFINED ENV{GEODE_SDK})
+    message(STATUS "Configuring Geode CLI SDK path to: $ENV{GEODE_SDK}")
+    
+    execute_process(
+        COMMAND "${GEODE_CLI}" sdk set-default "$ENV{GEODE_SDK}"
+        RESULT_VARIABLE GEODE_SET_RES
+    )
+    
     execute_process(
         COMMAND "${GEODE_CLI}" sdk install-binaries
         RESULT_VARIABLE GEODE_CLI_RES
     )
-    if(NOT GEODE_CLI_RES EQUAL 0)
-        message(WARNING "Failed to install loader binaries via CLI")
-    endif()
 endif()
 
 if(DEFINED ENV{GEODE_SDK})
