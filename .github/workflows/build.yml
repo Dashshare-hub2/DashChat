@@ -43,6 +43,18 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Pre-install Geode Loader Binaries
+        run: |
+          if [ -f "./my-epic-geode-cli/geode" ]; then
+            ./my-epic-geode-cli/geode sdk install-binaries
+          fi
+
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: ${{ matrix.config.target }}
+          combine: true
+
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
