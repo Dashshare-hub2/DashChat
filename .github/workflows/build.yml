@@ -1,4 +1,4 @@
-name: Build Geode Mod
+name: Build DashChat Mod
 
 on:
   workflow_dispatch:
@@ -7,7 +7,6 @@ on:
       - main
     paths-ignore:
       - 'README.md'
-      - 'LICENSE'
   pull_request:
     branches:
       - main
@@ -44,7 +43,6 @@ jobs:
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: v5.9.0
           target: ${{ matrix.config.target }}
           combine: true
 
