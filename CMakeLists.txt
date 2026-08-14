@@ -5,9 +5,22 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(DashChat LANGUAGES CXX)
+project(dashchat LANGUAGES CXX)
 
 set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
+
+find_program(GEODE_CLI geode PATHS "${CMAKE_SOURCE_DIR}/my-epic-geode-cli")
+
+if(GEODE_CLI)
+    message(STATUS "Found Geode CLI at ${GEODE_CLI}, installing binaries...")
+    execute_process(
+        COMMAND "${GEODE_CLI}" sdk install-binaries
+        RESULT_VARIABLE GEODE_CLI_RES
+    )
+    if(NOT GEODE_CLI_RES EQUAL 0)
+        message(WARNING "Failed to install loader binaries via CLI")
+    endif()
+endif()
 
 if(DEFINED ENV{GEODE_SDK})
     add_subdirectory("$ENV{GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
@@ -27,11 +40,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
-setup_geode_mod(DashChat
+setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
         src/ChatUI.cpp
 )
 
-target_link_libraries(DashChat PRIVATE sio_client)
+target_link_libraries(dashchat PRIVATE sio_client)
