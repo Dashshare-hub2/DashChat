@@ -32,7 +32,6 @@ jobs:
         with:
           sdk: 3.8.0
 
-      # Chạy build mod
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
