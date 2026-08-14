@@ -23,7 +23,7 @@ if(NOT TARGET Geode)
     FetchContent_Declare(
         GeodeSDK
         GIT_REPOSITORY https://github.com/geode-sdk/geode.git
-        GIT_TAG v3.8.0
+        GIT_TAG v5.9.0
     )
     FetchContent_MakeAvailable(GeodeSDK)
 endif()
