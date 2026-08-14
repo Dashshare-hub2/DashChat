@@ -1,0 +1,9 @@
+{
+  "geode": "3.8.0",
+  "id": "daianhnguyen.dashchat",
+  "name": "DashChat Global",
+  "version": "v1.0.0",
+  "developer": "daianhnguyen",
+  "description": "Real-time global & private 6-digit chat connected with Discord OAuth2.",
+  "dependencies": []
+}
