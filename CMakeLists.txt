@@ -7,8 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
-set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
-
 find_program(GEODE_CLI geode PATHS "${CMAKE_SOURCE_DIR}/my-epic-geode-cli")
 
 if(DEFINED ENV{GEODE_SDK})
@@ -18,19 +16,13 @@ else()
 endif()
 
 if(GEODE_CLI)
-    message(STATUS "Setting Geode CLI path to: ${TARGET_GEODE_SDK}")
+    message(STATUS "Running Geode CLI setup on: ${TARGET_GEODE_SDK}")
     execute_process(COMMAND "${GEODE_CLI}" sdk set-path "${TARGET_GEODE_SDK}")
     execute_process(COMMAND "${GEODE_CLI}" sdk install-binaries)
 endif()
 
-set(ENV{GEODE_SDK} "${TARGET_GEODE_SDK}")
-set(GEODE_SDK_PATH "${TARGET_GEODE_SDK}" CACHE PATH "Path to Geode SDK" FORCE)
-
-if(APPLE)
-    set(GEODE_LOADER_PATH "${TARGET_GEODE_SDK}/bin/Geode.dylib" CACHE PATH "" FORCE)
-elseif(WIN32)
-    set(GEODE_LOADER_PATH "${TARGET_GEODE_SDK}/bin/Geode.dll" CACHE PATH "" FORCE)
-endif()
+set(GEODE_DONT_LINK_LOADER ON CACHE BOOL "" FORCE)
+set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
 
 if(EXISTS "${TARGET_GEODE_SDK}/CMakeLists.txt")
     add_subdirectory("${TARGET_GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
