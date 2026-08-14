@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.config.name }}
+    name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -17,19 +17,19 @@ jobs:
         config:
           - name: Windows
             os: windows-latest
-            target: win
+            platform: win
           - name: macOS
             os: macos-latest
-            target: mac
+            platform: mac
           - name: Android (32-bit)
             os: ubuntu-latest
-            target: android32
+            platform: android32
           - name: Android (64-bit)
             os: ubuntu-latest
-            target: android64
+            platform: android64
           - name: iOS
             os: macos-latest
-            target: ios
+            platform: ios
 
     steps:
       - name: Checkout repository
@@ -41,11 +41,11 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: nightly
-          target: ${{ matrix.config.target }}
+          platform: ${{ matrix.config.platform }}
           combine: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dashchat-${{ matrix.config.target }}
+          name: dashchat-${{ matrix.config.platform }}
           path: build/*.geode
