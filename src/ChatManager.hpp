@@ -1,6 +1,5 @@
 #pragma once
 #include <Geode/Geode.hpp>
-#include <sio_client.h>
 #include <string>
 #include <functional>
 

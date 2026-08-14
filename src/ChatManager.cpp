@@ -1,6 +1,12 @@
 #pragma once
-#include <Geode/Geode.hpp>
 #include <sio_client.h>
+#ifdef WIN32
+    #undef OPTIONAL
+    #undef DELETE
+    #undef min
+    #undef max
+#endif
+#include <Geode/Geode.hpp>
 #include <string>
 #include <functional>
 

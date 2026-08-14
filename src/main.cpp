@@ -1,8 +1,14 @@
+#include <sio_client.h>
+#ifdef WIN32
+    #undef OPTIONAL
+    #undef DELETE
+    #undef min
+    #undef max
+#endif
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include "ChatManager.hpp"
 #include "ChatPopup.hpp"
-#include <sio_client.h>
 
 using namespace geode::prelude;
 

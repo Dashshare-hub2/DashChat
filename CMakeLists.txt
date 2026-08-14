@@ -25,7 +25,7 @@ set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 
 set(ASIOTPL_USE_BOOST OFF CACHE BOOL "" FORCE)
 set(SIO_USE_OPENSSL OFF CACHE BOOL "" FORCE)
-add_definitions(-DASIO_STANDALONE)
+add_definitions(-DASIO_STANDALONE -D_WIN32_WINNT=0x0601)
 
 FetchContent_Declare(
     asio
@@ -45,7 +45,6 @@ setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
-        src/ChatUI.cpp
 )
 
-target_link_libraries(dashchat PRIVATE sio_client asio)
+target_link_libraries(dashchat PRIVATE SYSTEM sio_client asio)
