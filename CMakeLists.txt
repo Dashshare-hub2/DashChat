@@ -7,12 +7,15 @@ project(dashchat LANGUAGES CXX)
 
 if(DEFINED ENV{GEODE_SDK} AND NOT Geode_DIR)
     set(Geode_DIR "$ENV{GEODE_SDK}")
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
 endif()
 
 find_package(Geode REQUIRED)
 
 include(FetchContent)
+
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     socketio
