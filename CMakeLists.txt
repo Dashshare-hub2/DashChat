@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.21)
 
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
-if(NOT DEFINED ENV{GEODE_SDK})
-    message(FATAL_ERROR "GEODE_SDK environment variable is not set! Make sure Geode SDK is installed.")
+if(DEFINED ENV{GEODE_SDK})
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
 endif()
 
-include("$ENV{GEODE_SDK}/GeodeFile.cmake")
+find_package(Geode REQUIRED)
 
 include(FetchContent)
 
