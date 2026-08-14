@@ -10,12 +10,12 @@ set(GEODE_DONT_LINK_LOADER ON CACHE BOOL "Disable linking loader binary" FORCE)
 set(GEODE_LINK_NIGHTLY ON CACHE BOOL "Link nightly binaries" FORCE)
 
 if(DEFINED ENV{GEODE_SDK})
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
-elseif(DEFINED GEODE_SDK)
+    set(GEODE_SDK "$ENV{GEODE_SDK}")
     list(APPEND CMAKE_PREFIX_PATH "${GEODE_SDK}")
 endif()
 
 find_package(Geode REQUIRED)
+
 
 include(FetchContent)
 
@@ -24,7 +24,7 @@ set(USE_TLS OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     ixwebsocket
-    GIT_REPOSITORY https://github.com/machinezone/ixwebsocket.git
+    GIT_REPOSITORY https://github.com/ixwebsocket/ixwebsocket.git
     GIT_TAG v11.4.4
 )
 FetchContent_MakeAvailable(ixwebsocket)

@@ -27,7 +27,13 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup Geode SDK
+        uses: geode-sdk/setup-geode-action@v1
+        with:
+          sdk: nightly
+
+      # Chạy build mod
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: nightly
+          combine: true
