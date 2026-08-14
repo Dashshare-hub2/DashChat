@@ -1,4 +1,4 @@
-name: Build Chat Mod
+name: Build Cross-Platform Geode Mod
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: Build ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -17,8 +17,19 @@ jobs:
         config:
           - name: Windows
             os: windows-latest
+            target: win
           - name: macOS
             os: macos-latest
+            target: mac
+          - name: Android (32-bit)
+            os: ubuntu-latest
+            target: android32
+          - name: Android (64-bit)
+            os: ubuntu-latest
+            target: android64
+          - name: iOS
+            os: macos-latest
+            target: ios
 
     steps:
       - name: Checkout repository
@@ -29,11 +40,12 @@ jobs:
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: v5.9.0
+          sdk: nightly
+          target: ${{ matrix.config.target }}
           combine: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dashchat-${{ matrix.config.name }}
+          name: dashchat-${{ matrix.config.target }}
           path: build/*.geode
