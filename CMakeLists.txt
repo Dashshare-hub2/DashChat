@@ -15,7 +15,7 @@ if(GEODE_CLI AND DEFINED ENV{GEODE_SDK})
     message(STATUS "Configuring Geode CLI SDK path to: $ENV{GEODE_SDK}")
     
     execute_process(
-        COMMAND "${GEODE_CLI}" sdk set-default "$ENV{GEODE_SDK}"
+        COMMAND "${GEODE_CLI}" sdk set-path "$ENV{GEODE_SDK}"
         RESULT_VARIABLE GEODE_SET_RES
     )
     
@@ -23,6 +23,8 @@ if(GEODE_CLI AND DEFINED ENV{GEODE_SDK})
         COMMAND "${GEODE_CLI}" sdk install-binaries
         RESULT_VARIABLE GEODE_CLI_RES
     )
+    
+    set(GEODE_SDK_PATH "$ENV{GEODE_SDK}" CACHE PATH "" FORCE)
 endif()
 
 if(DEFINED ENV{GEODE_SDK})
@@ -43,6 +45,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
+ư
 setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
