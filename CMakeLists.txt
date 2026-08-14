@@ -7,11 +7,18 @@ project(dashchat LANGUAGES CXX)
 find_package(Geode REQUIRED)
 
 include(FetchContent)
+
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(USE_LIBUNITTEST OFF CACHE BOOL "" FORCE)
+
 FetchContent_Declare(
     socketio
     GIT_REPOSITORY https://github.com/socketio/socket.io-client-cpp.git
     GIT_TAG v3.1.0
+    GIT_SHALLOW TRUE
 )
+
 FetchContent_MakeAvailable(socketio)
 
 add_geode_mod(dashchat
