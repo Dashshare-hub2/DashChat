@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 3.21)
 
+if(POLICY CMP0169)
+    cmake_policy(SET CMP0169 OLD)
+endif()
+
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
+
+set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
 
 if(DEFINED ENV{GEODE_SDK})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
@@ -17,7 +23,7 @@ if(NOT TARGET Geode)
     FetchContent_Declare(
         GeodeSDK
         GIT_REPOSITORY https://github.com/geode-sdk/geode.git
-        GIT_TAG v3.8.0 
+        GIT_TAG v3.8.0
     )
     FetchContent_MakeAvailable(GeodeSDK)
 endif()
