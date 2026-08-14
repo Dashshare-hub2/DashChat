@@ -7,11 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
-if(DEFINED ENV{GEODE_SDK})
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
-endif()
+set(GEODE_DONT_LINK_LOADER ON CACHE BOOL "Disable linking loader binary" FORCE)
+set(GEODE_LINK_NIGHTLY ON CACHE BOOL "Link nightly binaries" FORCE)
 
-find_package(Geode REQUIRED)
+if(DEFINED ENV{GEODE_SDK})
+    set(GEODE_SDK "$ENV{GEODE_SDK}" CACHE PATH "Path to Geode SDK" FORCE)
+    add_subdirectory("${GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
+else()
+    find_package(Geode REQUIRED)
+endif()
 
 include(FetchContent)
 
