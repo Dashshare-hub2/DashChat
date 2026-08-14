@@ -5,20 +5,15 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(dashchat LANGUAGES CXX)
+project(DashChat LANGUAGES CXX)
 
 set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
 
 if(DEFINED ENV{GEODE_SDK})
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}/share/Geode/cmake")
-    include("$ENV{GEODE_SDK}/share/Geode/cmake/GeodeFile.cmake" OPTIONAL)
-endif()
-
-if(NOT TARGET Geode)
+    add_subdirectory("$ENV{GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
+else()
     find_package(Geode REQUIRED)
 endif()
-
 
 include(FetchContent)
 
@@ -32,11 +27,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(socketio)
 
-setup_geode_mod(dashchat
+setup_geode_mod(DashChat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
         src/ChatUI.cpp
 )
 
-target_link_libraries(dashchat PRIVATE sio_client)
+target_link_libraries(DashChat PRIVATE sio_client)
