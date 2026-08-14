@@ -1,4 +1,4 @@
-name: Build Geode Mod
+name: Build Chat Mod
 
 on:
   workflow_dispatch:
