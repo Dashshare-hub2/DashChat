@@ -24,6 +24,14 @@ set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 
 set(ASIOTPL_USE_BOOST OFF CACHE BOOL "" FORCE)
 set(SIO_USE_OPENSSL OFF CACHE BOOL "" FORCE)
+add_definitions(-DASIO_STANDALONE)
+
+FetchContent_Declare(
+    asio
+    GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+    GIT_TAG ASIO_1_28_0
+)
+FetchContent_MakeAvailable(asio)
 
 FetchContent_Declare(
     socketio
@@ -36,7 +44,6 @@ setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
-        src/ChatUI.cpp
 )
 
-target_link_libraries(dashchat PRIVATE sio_client)
+target_link_libraries(dashchat PRIVATE sio_client asio)
