@@ -5,11 +5,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
-if(NOT DEFINED ENV{GEODE_SDK})
-    message(FATAL_ERROR "GEODE_SDK environment variable is not set! Please install Geode SDK.")
+if(DEFINED ENV{GEODE_SDK})
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
 endif()
 
-include("$ENV{GEODE_SDK}/share/Geode/cmake/Geode.cmake")
+find_package(Geode REQUIRED)
 
 include(FetchContent)
 
@@ -19,8 +19,7 @@ set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     socketio
     GIT_REPOSITORY https://github.com/socketio/socket.io-client-cpp.git
-    GIT_TAG v3.1.0
-    GIT_SHALLOW TRUE
+    GIT_TAG 3.1.0
 )
 FetchContent_MakeAvailable(socketio)
 
