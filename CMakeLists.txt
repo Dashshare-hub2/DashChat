@@ -8,41 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(dashchat LANGUAGES CXX)
 
 if(DEFINED ENV{GEODE_SDK})
-    set(TARGET_GEODE_SDK "$ENV{GEODE_SDK}")
-else()
-    set(TARGET_GEODE_SDK "${CMAKE_SOURCE_DIR}/geode-sdk-clone")
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
 endif()
 
-find_program(GEODE_CLI geode PATHS "${CMAKE_SOURCE_DIR}/my-epic-geode-cli")
-
-if(GEODE_CLI)
-    message(STATUS "Setting Geode CLI path to: ${TARGET_GEODE_SDK}")
-    execute_process(COMMAND "${GEODE_CLI}" sdk set-path "${TARGET_GEODE_SDK}")
-    execute_process(COMMAND "${GEODE_CLI}" sdk install-binaries)
-endif()
-
-set(GEODE_LINK_NIGHTLY ON CACHE BOOL "" FORCE)
-
-if(APPLE)
-    set(GEODE_TARGET_PLATFORM "MacOS")
-    set(GEODE_LOADER_NAME "Geode.dylib")
-elseif(WIN32)
-    set(GEODE_TARGET_PLATFORM "Win64")
-    set(GEODE_LOADER_NAME "Geode.dll")
-else()
-    set(GEODE_TARGET_PLATFORM "Android64")
-    set(GEODE_LOADER_NAME "libGeode.so")
-endif()
-
-file(MAKE_DIRECTORY "${TARGET_GEODE_SDK}/bin/${GEODE_TARGET_PLATFORM}")
-file(TOUCH "${TARGET_GEODE_SDK}/bin/${GEODE_TARGET_PLATFORM}/${GEODE_LOADER_NAME}")
-file(TOUCH "${TARGET_GEODE_SDK}/bin/${GEODE_LOADER_NAME}")
-
-if(EXISTS "${TARGET_GEODE_SDK}/CMakeLists.txt")
-    add_subdirectory("${TARGET_GEODE_SDK}" "${CMAKE_BINARY_DIR}/geode")
-else()
-    find_package(Geode REQUIRED)
-endif()
+find_package(Geode REQUIRED)
 
 include(FetchContent)
 
