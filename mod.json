@@ -1,9 +1,9 @@
 {
-  "geode": "v5.9.0",
-  "id": "daianhnguyen.dashchat",
-  "version": "v1.0.0",
-  "name": "DashChat Global",
-  "developer": "daianhnguyen",
-  "description": "Real-time global and private 6-digit chat using Socket.IO",
-  "dependencies": []
+	"geode": "3.8.0",
+	"id": "dashshare.dashchat",
+	"name": "DashChat",
+	"version": "v1.0.0",
+	"developer": "Dashshare",
+	"description": "Global real-time chat mod for Geometry Dash using Socket.IO.",
+	"dependencies": []
 }
