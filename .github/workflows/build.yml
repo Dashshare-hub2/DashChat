@@ -40,7 +40,6 @@ jobs:
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: latest
           platform: ${{ matrix.config.platform }}
           combine: true
 
