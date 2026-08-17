@@ -40,11 +40,6 @@ jobs:
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: nightly
           platform: ${{ matrix.config.platform }}
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dashchat-${{ matrix.config.platform }}
-          path: build/*.geode
+          sdk: nightly
+          combine: true

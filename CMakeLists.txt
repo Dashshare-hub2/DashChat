@@ -11,13 +11,16 @@ elseif(DEFINED GEODE_SDK)
     list(APPEND CMAKE_PREFIX_PATH "${GEODE_SDK}")
 endif()
 
-if(NOT GEODE_SDK)
-    if(EXISTS "$ENV{HOME}/.local/share/geode/sdk")
-        list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/.local/share/geode/sdk")
-    elseif(EXISTS "$ENV{HOME}/Library/Application Support/geode/sdk")
-        list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/Library/Application Support/geode/sdk")
+file(GLOB GEODE_CLI_SDK_PATHS
+    "$ENV{HOME}/.local/share/geode/sdk/*"
+    "$ENV{HOME}/Library/Application Support/geode/sdk/*"
+    "$ENV{RUNNER_TEMP}/geode/sdk"
+)
+foreach(PATH_ITEM ${GEODE_CLI_SDK_PATHS})
+    if(EXISTS "${PATH_ITEM}")
+        list(APPEND CMAKE_PREFIX_PATH "${PATH_ITEM}")
     endif()
-endif()
+endforeach()
 
 find_package(Geode REQUIRED)
 
@@ -32,7 +35,6 @@ FetchContent_Declare(
     GIT_TAG v11.4.4
 )
 FetchContent_MakeAvailable(ixwebsocket)
-
 setup_geode_mod(dashchat
     SOURCES
         src/main.cpp
