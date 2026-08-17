@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: Build ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -42,7 +42,6 @@ jobs:
         with:
           sdk: nightly
           platform: ${{ matrix.config.platform }}
-          combine: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
