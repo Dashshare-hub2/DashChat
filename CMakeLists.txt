@@ -27,7 +27,7 @@ endif()
 
 set(MOD_ID "daianhnguyen.dashchat")
 
-add_library({MOD_ID} SHARED
+add_library(${MOD_ID} SHARED
     src/main.cpp
     src/Network/WebSocketManager.cpp
     src/UI/ChatOverlay.cpp
@@ -36,7 +36,7 @@ add_library({MOD_ID} SHARED
     src/hooks/PauseLayer.cpp
 )
 
-setup_geode_mod({MOD_ID})
+setup_geode_mod(${MOD_ID})
 if(APPLE)
     target_link_libraries(${MOD_ID} "-Wl,-undefined,dynamic_lookup")
     set_target_properties(${MOD_ID} PROPERTIES
