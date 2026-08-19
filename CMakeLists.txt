@@ -30,8 +30,13 @@ set(MOD_ID "daianhnguyen.dashchat")
 add_library(${MOD_ID} SHARED)
 
 setup_geode_mod(${MOD_ID}
-    SOURCES
-        src/*.cpp
+   SOURCES
+    src/main.cpp
+    src/Network/WebSocketManager.cpp
+    src/UI/ChatCell.cpp
+    src/UI/ChatOverlay.cpp
+    src/hooks/PlayLayer.cpp
+    src/hooks/PauseLayer.cpp
 )
 
 target_link_libraries(${MOD_ID} ixwebsocket)

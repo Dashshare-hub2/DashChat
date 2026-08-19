@@ -12,19 +12,14 @@
 	"description": "Global Realtime Chat Mod for Geometry Dash",
 	"settings": {
 		"server-url": {
-			"name": "Server URL",
-			"type": "string",
-			"default": "ws://dashchat-rsuk.onrender.com"
-		},
-		"invite-code": {
-			"name": "Invite Code",
-			"type": "string",
-			"default": "DASH-GLOBAL-CHAT"
-		},
-		"enable-chat": {
-			"name": "Enable Chat",
-			"type": "bool",
-			"default": true
-		}
+      "name": "Server URL",
+      "type": "string",
+      "default": "wss://dashchat-rsuk.onrender.com"
+    },
+    "invite-code": {
+      "name": "Invite Code",
+      "type": "string",
+      "default": "DASH2026"
+    }
 	}
 }
