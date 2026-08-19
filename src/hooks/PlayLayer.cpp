@@ -20,9 +20,8 @@ class $modify(MyPlayLayer, PlayLayer) {
         overlay->setID("dashchat-overlay"_spr);
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
-        
-        overlay->setPosition({winSize.width - 230.0f, 50.0f});
-        overlay->setZOrder(99999);
+        overlay->setPosition({winSize.width - 230.0f, 40.0f});
+        overlay->setZOrder(99999); 
 
         this->addChild(overlay);
         m_fields->m_chatOverlay = overlay;

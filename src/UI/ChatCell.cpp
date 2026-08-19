@@ -16,7 +16,8 @@ bool ChatCell::init(std::string const& username, std::string const& message, ccC
     float cellWidth = 210.0f;
     float padding = 4.0f;
 
-    m_bg = CCLayerColor::create(ccc4(0, 0, 0, 80), cellWidth, 18.0f);
+  
+    m_bg = CCLayerColor::create(ccc4(0, 0, 0, 90), cellWidth, 18.0f);
     m_bg->setIgnoreAnchorPointForPosition(false);
     m_bg->setAnchorPoint({0.0f, 0.0f});
     this->addChild(m_bg, -1);
@@ -40,10 +41,4 @@ bool ChatCell::init(std::string const& username, std::string const& message, ccC
 
     this->setContentSize({cellWidth, 18.0f});
     return true;
-}
-
-void ChatCell::setCellOpacity(GLubyte opacity) {
-    if (m_bg) m_bg->setOpacity(opacity);
-    if (m_usernameLabel) m_usernameLabel->setOpacity(opacity);
-    if (m_messageLabel) m_messageLabel->setOpacity(opacity);
 }
