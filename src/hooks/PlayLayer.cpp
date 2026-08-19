@@ -1,0 +1,47 @@
+#include <Geode/Geode.hpp>
+#include <Geode/modify/PlayLayer.hpp>
+#include "../UI/ChatOverlay.hpp"
+#include "../Network/WebSocketManager.hpp"
+
+using namespace geode::prelude;
+
+class $modify(MyPlayLayer, PlayLayer) {
+    struct Fields {
+        ChatOverlay* m_chatOverlay = nullptr;
+    };
+
+    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+        WebSocketManager::get().connect();
+
+        if (auto uiLayer = this->m_uiLayer) {
+            std::string levelID = std::to_string(level->m_levelID.value());
+            auto overlay = ChatOverlay::create(levelID);
+            overlay->setID("dashchat-overlay"_spr);
+            
+            auto winSize = CCDirector::sharedDirector()->getWinSize();
+            overlay->setPosition({10.0f, winSize.height - 120.0f});
+            overlay->setZOrder(999);
+
+            uiLayer->addChild(overlay);
+            m_fields->m_chatOverlay = overlay;
+        }
+
+        return true;
+    }
+
+    void keyDown(enumKeyCodes key) {
+        if (m_fields->m_chatOverlay) {
+            if (key == KEY_Slash && !m_fields->m_chatOverlay->isTyping()) {
+                m_fields->m_chatOverlay->toggleInput(true);
+                return;
+            }
+            if (key == KEY_Enter && m_fields->m_chatOverlay->isTyping()) {
+                m_fields->m_chatOverlay->sendCurrentMessage();
+                return;
+            }
+        }
+        PlayLayer::keyDown(key);
+    }
+};

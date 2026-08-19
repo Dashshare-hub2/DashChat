@@ -1,65 +1,39 @@
 #include "WebSocketManager.hpp"
-#include "../UI/ChatOverlay.hpp"
 
-WebSocketManager& WebSocketManager::get() {
-    static WebSocketManager instance;
-    return instance;
-}
+using namespace geode::prelude;
 
 void WebSocketManager::connect() {
-    std::string serverUrl = Mod::get()->getSettingValue<std::string>("server-url");
-    std::string inviteCode = Mod::get()->getSettingValue<std::string>("invite-code");
+    if (m_connected) return;
 
-    m_webSocket.setUrl(serverUrl);
+    std::string url = Mod::get()->getSettingValue<std::string>("server-url");
+    std::string token = Mod::get()->getSettingValue<std::string>("user-token");
 
-    m_webSocket.setOnMessageCallback([this, inviteCode](const ix::WebSocketMessagePtr& msg) {
+    if (url.empty()) return;
+
+    std::string fullUrl = url + "?token=" + token;
+    m_webSocket.setUrl(fullUrl);
+
+    m_webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         if (msg->type == ix::WebSocketMessageType::Open) {
-            m_isConnected = true;
-            
-            // Lấy thông tin tài khoản GD
-            auto AM = GJAccountManager::sharedState();
-            int accountID = AM->m_accountID;
-            std::string username = AM->m_username.empty() ? "Player" : AM->m_username;
+            m_connected = true;
+            log::info("Connected to DashChat WebSocket Server!");
+        } else if (msg->type == ix::WebSocketMessageType::Close) {
+            m_connected = false;
+            log::info("Disconnected from WebSocket Server.");
+        } else if (msg->type == ix::WebSocketMessageType::Message) {
+            auto jsonResult = matjson::parse(msg->str);
+            if (jsonResult.is_ok()) {
+                auto data = jsonResult.unwrap();
+                std::string sender = data["sender"].as_string();
+                std::string text = data["text"].as_string();
+                std::string color = data.contains("color") ? data["color"].as_string() : "#FFFFFF";
 
-            matjson::Value authPayload;
-            authPayload["type"] = "auth";
-            authPayload["accountID"] = accountID;
-            authPayload["username"] = username;
-            authPayload["inviteCode"] = inviteCode;
-
-            m_webSocket.send(authPayload.dump());
-        } 
-        else if (msg->type == ix::WebSocketMessageType::Message) {
-            std::string err;
-            auto data = matjson::parse(msg->str, err);
-            if (err.empty() && data.is_object()) {
-                std::string type = data["type"].as_string();
-
-                if (type == "chat") {
-                    std::string sender = data["sender"].as_string();
-                    std::string message = data["message"].as_string();
-
-                    geode::queueInMainThread([sender, message]() {
-                        if (auto overlay = ChatOverlay::get()) {
-                            overlay->addMessage(sender, message);
-                        }
-                    });
-                }
-                else if (type == "error") {
-                    std::string errorMsg = data["message"].as_string();
-                    geode::queueInMainThread([errorMsg]() {
-                        Notification::create(errorMsg, NotificationIcon::Error)->show();
-                    });
-                }
-                else if (type == "auth_success") {
-                    geode::queueInMainThread([]() {
-                        Notification::create("DashChat: Ket noi server thanh cong!", NotificationIcon::Success)->show();
-                    });
-                }
+                geode::queueInMainThread([this, sender, text, color]() {
+                    if (m_onMessageReceived) {
+                        m_onMessageReceived(sender, text, color);
+                    }
+                });
             }
-        }
-        else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
-            m_isConnected = false;
         }
     });
 
@@ -68,21 +42,16 @@ void WebSocketManager::connect() {
 
 void WebSocketManager::disconnect() {
     m_webSocket.stop();
-    m_isConnected = false;
+    m_connected = false;
 }
 
-void WebSocketManager::sendMessage(const std::string& message) {
-    if (!m_isConnected) {
-        Notification::create("Chua ket noi toi Server DashChat!", NotificationIcon::Warning)->show();
-        return;
-    }
+void WebSocketManager::sendMessage(std::string const& text, std::string const& levelID) {
+    if (!m_connected) return;
 
-    auto AM = GJAccountManager::sharedState();
+    matjson::Value json;
+    json["type"] = "chat";
+    json["text"] = text;
+    json["levelID"] = levelID;
 
-    matjson::Value chatPayload;
-    chatPayload["type"] = "chat";
-    chatPayload["sender"] = AM->m_username.empty() ? "Player" : AM->m_username;
-    chatPayload["message"] = message;
-
-    m_webSocket.send(chatPayload.dump());
+    m_webSocket.send(json.dump());
 }

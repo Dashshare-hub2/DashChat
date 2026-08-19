@@ -1,8 +1,8 @@
 #include "ChatCell.hpp"
 
-ChatCell* ChatCell::create(const std::string& sender, const std::string& message) {
+ChatCell* ChatCell::create(std::string const& username, std::string const& message, ccColor3B userColor) {
     auto ret = new ChatCell();
-    if (ret && ret->init(sender, message)) {
+    if (ret && ret->init(username, message, userColor)) {
         ret->autorelease();
         return ret;
     }
@@ -10,15 +10,30 @@ ChatCell* ChatCell::create(const std::string& sender, const std::string& message
     return nullptr;
 }
 
-bool ChatCell::init(const std::string& sender, const std::string& message) {
+bool ChatCell::init(std::string const& username, std::string const& message, ccColor3B userColor) {
     if (!CCNode::init()) return false;
 
-    std::string text = fmt::format("{}: {}", sender, message);
-    auto label = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
-    label->setScale(0.4f);
-    label->setAnchorPoint({0.0f, 0.5f});
-    this->addChild(label);
+    float padding = 4.0f;
+    std::string userStr = username + ": ";
 
-    this->setContentSize({ 180.0f, 18.0f });
+    m_usernameLabel = CCLabelBMFont::create(userStr.c_str(), "chatFont.fnt");
+    m_usernameLabel->setScale(0.40f);
+    m_usernameLabel->setColor(userColor);
+    m_usernameLabel->setAnchorPoint({0.0f, 1.0f});
+
+    m_messageLabel = CCLabelBMFont::create(message.c_str(), "chatFont.fnt");
+    m_messageLabel->setScale(0.40f);
+    m_messageLabel->setAnchorPoint({0.0f, 1.0f});
+
+    float userWidth = m_usernameLabel->getScaledContentSize().width;
+    m_usernameLabel->setPosition({padding, 0.0f});
+    m_messageLabel->setPosition({padding + userWidth, 0.0f});
+
+    this->addChild(m_usernameLabel);
+    this->addChild(m_messageLabel);
+
+    float totalHeight = std::max(m_usernameLabel->getScaledContentSize().height, m_messageLabel->getScaledContentSize().height) + padding;
+    this->setContentSize({220.0f, totalHeight});
+
     return true;
 }

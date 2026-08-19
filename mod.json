@@ -12,14 +12,16 @@
 	"description": "Global Realtime Chat Mod for Geometry Dash",
 	"settings": {
 		"server-url": {
-      "name": "Server URL",
+      "name": "Server WebSocket URL",
+      "description": "WebSocket URL for DashChat backend.",
       "type": "string",
       "default": "wss://dashchat-rsuk.onrender.com"
     },
-    "invite-code": {
-      "name": "Invite Code",
+    "user-token": {
+      "name": "User Session Token",
+      "description": "Paste your authentication token received from Discord OAuth.",
       "type": "string",
-      "default": "DASH2026"
+      "default": ""
     }
 	}
 }
