@@ -10,13 +10,6 @@
 	"version": "v1.0.0",
 	"developer": "daianhnguyen",
 	"description": "Global Realtime Chat Mod for Geometry Dash",
-  "dependencies": [
-    {
-      "id": "geode.node-ids",
-      "version": ">=1.23.3",
-      "importance": "required"
-    }
-  ],
 	"settings": {
 		"server-url": {
       "name": "Server WebSocket URL",
