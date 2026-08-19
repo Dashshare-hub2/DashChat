@@ -30,10 +30,16 @@ else()
     find_package(Geode REQUIRED)
 endif()
 
-setup_geode_mod(${GEODE_MOD_TARGET}
+set(GEODE_MOD_ID "daianhnguyen.dashchat")
+
+if(COMMAND create_geode_mod)
+    create_geode_mod(${GEODE_MOD_ID})
+endif()
+
+setup_geode_mod(${GEODE_MOD_ID}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-target_link_libraries(${GEODE_MOD_TARGET} PRIVATE ixwebsocket)
+target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
