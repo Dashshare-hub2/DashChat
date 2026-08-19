@@ -39,8 +39,8 @@ setup_geode_mod(${MOD_ID}
     src/hooks/PauseLayer.cpp
 )
 if(APPLE)
-    target_link_libraries(DashChat PRIVATE "-Wl,-undefined,dynamic_lookup")
-    set_target_properties(DashChat PROPERTIES
+    target_link_libraries(${MOD_ID} "-Wl,-undefined,dynamic_lookup")
+    set_target_properties(${MOD_ID} PROPERTIES
         ENABLE_EXPORTS TRUE
         XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING "NO"
     )
