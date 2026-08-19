@@ -27,7 +27,7 @@ endif()
 
 set(MOD_ID "daianhnguyen.dashchat")
 
-setup_geode_mod(${MOD_ID}
+add_geode_mod(${MOD_ID}
    SOURCES
     src/main.cpp
     src/Network/WebSocketManager.cpp
