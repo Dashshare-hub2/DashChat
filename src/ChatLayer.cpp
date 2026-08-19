@@ -1,86 +1,49 @@
 #include "ChatLayer.hpp"
-#include "ChatManager.hpp"
+#include "ChatCell.hpp"
 
-using namespace geode::prelude;
-
-bool ChatLayer::setup(std::string const& roomName) {
-    this->setTitle("DashChat - Room: " + roomName);
+bool ChatLayer::setup(std::string const& inviteCode) {
+    m_inviteCode = inviteCode;
+    this->setTitle("DashChat");
 
     auto winSize = m_mainLayer->getContentSize();
 
+    m_scrollLayer = ScrollLayer::create({winSize.width - 20.f, winSize.height - 60.f});
+    m_scrollLayer->setPosition({10.f, 40.f});
+    m_mainLayer->addChild(m_scrollLayer);
 
-    m_messagesMenu = CCMenu::create();
-    m_messagesMenu->setPosition({0, 0});
-    m_messagesMenu->setContentSize({winSize.width - 40.f, 130.f});
-
-
-    m_inputNode = CCTextInputNode::create(200.f, 30.f, "Nhập tin nhắn...", "chatFont.fnt");
-    m_inputNode->setPosition({winSize.width / 2.0f - 30.f, 30.f});
-    m_mainLayer->addChild(m_inputNode);
-
-
-    auto sendSpr = ButtonSprite::create("Gửi", "goldFont.fnt", "GJ_button_01.png", 0.8f);
-    auto sendBtn = CCMenuItemSpriteExtra::create(
-        sendSpr, this, menu_selector(ChatLayer::onSend)
-    );
-    sendBtn->setPosition({winSize.width / 2.0f + 90.f, 30.f});
-
-    auto actionMenu = CCMenu::create();
-    actionMenu->setPosition({0, 0});
-    actionMenu->addChild(sendBtn);
-    m_mainLayer->addChild(actionMenu);
-
-
-    ChatManager::get()->setOnMessageCallback([this](const std::string& sender, const std::string& msg, bool isDiscord) {
-        this->appendMessageUI(sender, msg, isDiscord);
-    });
+    this->reloadMessages();
 
     return true;
 }
 
-void ChatLayer::onSend(CCObject*) {
-    if (!m_inputNode) return;
+void ChatLayer::reloadMessages() {
+    if (!m_scrollLayer) return;
 
-    std::string text = m_inputNode->getString();
-    if (!text.empty()) {
- 
-        ChatManager::get()->sendMessage(text);
+    m_scrollLayer->m_contentLayer->removeAllChildren();
 
-  
-        auto username = GJAccountManager::sharedState()->m_username;
-        appendMessageUI(username.empty() ? "Me" : username, text, false);
+    auto messages = ChatManager::get()->getMessages();
+    float width = m_scrollLayer->getContentSize().width;
+    float totalHeight = messages.size() * 42.f;
 
-        m_inputNode->setString("");
-    }
-}
+    m_scrollLayer->m_contentLayer->setContentSize({width, std::max(totalHeight, m_scrollLayer->getContentSize().height)});
 
-void ChatLayer::appendMessageUI(const std::string& sender, const std::string& content, bool isDiscord) {
-    std::string formattedText = fmt::format("{}{}: {}", isDiscord ? "[Discord] " : "", sender, content);
-    
-    auto label = CCLabelBMFont::create(formattedText.c_str(), "chatFont.fnt");
-    label->setScale(0.55f);
-    label->setAnchorPoint({0.0f, 0.5f});
-    
-    if (isDiscord) {
-        label->setColor({114, 137, 218});
+    float y = totalHeight - 20.f;
+    for (const auto& msg : messages) {
+        auto cell = ChatCell::create(msg, width);
+        cell->setPosition({0.f, y - 20.f});
+        m_scrollLayer->m_contentLayer->addChild(cell);
+        y -= 42.f;
     }
 
-    label->setPosition({20.f, m_mainLayer->getContentSize().height - 70.f - m_chatContentHeight});
-    m_mainLayer->addChild(label);
-
-    m_chatContentHeight += 16.0f; 
+    m_scrollLayer->moveToTop();
 }
 
-ChatLayer* ChatLayer::create(std::string const& roomName) {
+ChatLayer* ChatLayer::create(std::string const& inviteCode) {
     auto ret = new ChatLayer();
-    if (ret && ret->initAnchored(340.f, 220.f, roomName)) {
+    if (ret && ret->initAnchored(360.f, 220.f, inviteCode)) {
         ret->autorelease();
         return ret;
     }
     CC_SAFE_DELETE(ret);
     return nullptr;
-}
-
-ChatLayer::~ChatLayer() {
-    ChatManager::get()->setOnMessageCallback(nullptr);
 }

@@ -1,28 +1,28 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <ixwebsocket/IXWebSocket.h>
+#include <vector>
 #include <string>
-#include <functional>
-#include <mutex>
+
+struct ChatMessage {
+    std::string author;
+    std::string content;
+};
 
 class ChatManager {
 private:
-    ixwebsocket::WebSocket m_webSocket;
-    bool m_isConnected = false;
-    std::mutex m_callbackMutex;
-    
-    std::function<void(const std::string&, const std::string&, bool)> m_onMessageCallback;
-
-    ChatManager() = default;
+    static ChatManager* instance;
+    bool m_connected = false;
+    std::vector<ChatMessage> m_messages;
 
 public:
     static ChatManager* get();
-
     void connect();
     void disconnect();
-    void sendMessage(const std::string& message);
+    bool isConnected() const;
     
-    void setOnMessageCallback(std::function<void(const std::string&, const std::string&, bool)> cb);
-    bool isConnected() const { return m_isConnected; }
+    const std::vector<ChatMessage>& getMessages() const { return m_messages; }
+    void addMessage(const std::string& author, const std::string& content) {
+        m_messages.push_back({author, content});
+    }
 };
