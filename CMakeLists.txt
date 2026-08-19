@@ -17,12 +17,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
+if (NOT DEFINED ENV{GEODE_SDK})
+    message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable")
+else()
+    message(STATUS "Found Geode: $ENV{GEODE_SDK}")
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
+endif()
+
 find_package(Geode REQUIRED)
 
-setup_geode_mod(${PROJECT_NAME}
+
+set(MOD_ID "daianhnguyen.dashchat")
+
+setup_geode_mod(${MOD_ID}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ixwebsocket)
+target_link_libraries(${MOD_ID} PRIVATE ixwebsocket)
