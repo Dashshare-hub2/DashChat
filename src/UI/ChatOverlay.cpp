@@ -31,11 +31,12 @@ bool ChatOverlay::init(std::string const& levelID) {
     m_container = CCMenu::create();
     m_container->setPosition({0.0f, 25.0f});
     m_container->setAnchorPoint({0.0f, 0.0f});
+    m_container->setContentSize({width, height - 25.0f});
     this->addChild(m_container);
 
-    m_inputField = CCTextInputNode::create(width - 10.0f, 20.0f, "Press '/' to chat...", "chatFont.fnt");
+    // Dùng TextInput wrapper chính thức từ Geode UI
+    m_inputField = TextInput::create(width - 10.0f, "Press '/' to chat...", "chatFont.fnt");
     m_inputField->setPosition({width / 2.0f, 12.0f});
-    m_inputField->setDelegate(this);
     m_inputField->setVisible(false);
     this->addChild(m_inputField);
 

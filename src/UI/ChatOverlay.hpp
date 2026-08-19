@@ -1,14 +1,15 @@
 #pragma once
 #include <Geode/Geode.hpp>
+#include <Geode/ui/TextInput.hpp>
 #include "ChatCell.hpp"
 
 using namespace geode::prelude;
 
-class ChatOverlay : public CCNode, public CCTextInputDelegate {
+class ChatOverlay : public CCNode {
 protected:
-    CCArray* m_messages;
-    CCMenu* m_container;
-    CCTextInputNode* m_inputField;
+    CCArray* m_messages = nullptr;
+    CCMenu* m_container = nullptr;
+    TextInput* m_inputField = nullptr;
     bool m_isTyping = false;
     std::string m_levelID;
 

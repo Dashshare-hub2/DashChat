@@ -19,15 +19,15 @@ bool ChatCell::init(std::string const& username, std::string const& message, ccC
     m_usernameLabel = CCLabelBMFont::create(userStr.c_str(), "chatFont.fnt");
     m_usernameLabel->setScale(0.40f);
     m_usernameLabel->setColor(userColor);
-    m_usernameLabel->setAnchorPoint({0.0f, 1.0f});
+    m_usernameLabel->setAnchorPoint({0.0f, 0.5f});
 
     m_messageLabel = CCLabelBMFont::create(message.c_str(), "chatFont.fnt");
     m_messageLabel->setScale(0.40f);
-    m_messageLabel->setAnchorPoint({0.0f, 1.0f});
+    m_messageLabel->setAnchorPoint({0.0f, 0.5f});
 
     float userWidth = m_usernameLabel->getScaledContentSize().width;
-    m_usernameLabel->setPosition({padding, 0.0f});
-    m_messageLabel->setPosition({padding + userWidth, 0.0f});
+    m_usernameLabel->setPosition({padding, 10.0f});
+    m_messageLabel->setPosition({padding + userWidth, 10.0f});
 
     this->addChild(m_usernameLabel);
     this->addChild(m_messageLabel);

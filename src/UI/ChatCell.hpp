@@ -5,8 +5,8 @@ using namespace geode::prelude;
 
 class ChatCell : public CCNode {
 protected:
-    CCLabelBMFont* m_usernameLabel;
-    CCLabelBMFont* m_messageLabel;
+    CCLabelBMFont* m_usernameLabel = nullptr;
+    CCLabelBMFont* m_messageLabel = nullptr;
 
     bool init(std::string const& username, std::string const& message, ccColor3B userColor);
 
