@@ -37,11 +37,6 @@ jobs:
         with:
           submodules: true
 
-      - name: Setup Geode
-        uses: geode-sdk/setup-geode@v2
-        with:
-          cli: nightly
-
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
