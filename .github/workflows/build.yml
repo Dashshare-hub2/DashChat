@@ -37,6 +37,9 @@ jobs:
         with:
           submodules: true
 
+      - name: Setup Geode CLI
+        uses: geode-sdk/cli-action@v2
+
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:

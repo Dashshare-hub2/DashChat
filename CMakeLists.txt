@@ -5,12 +5,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(dashchat LANGUAGES CXX)
 
-if(DEFINED ENV{GEODE_SDK})
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
-elseif(DEFINED GEODE_SDK)
-    list(APPEND CMAKE_PREFIX_PATH "${GEODE_SDK}")
+if(NOT DEFINED GEODE_SDK)
+    if(DEFINED ENV{GEODE_SDK})
+        set(GEODE_SDK "$ENV{GEODE_SDK}")
+    else()
+        message(FATAL_ERROR "Could not find Geode SDK! Please set GEODE_SDK environment variable or install Geode CLI.")
+    endif()
 endif()
 
+list(APPEND CMAKE_PREFIX_PATH "${GEODE_SDK}")
 find_package(Geode REQUIRED)
 
 include(FetchContent)
