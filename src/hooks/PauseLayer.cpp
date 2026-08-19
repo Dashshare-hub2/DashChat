@@ -5,6 +5,6 @@ using namespace geode::prelude;
 
 class $modify(MyPauseLayer, PauseLayer) {
     void customWebBtnCallback(CCObject* sender) {
-        geode::utils::web::openURLInBrowser("https://dashchat-rsuk.onrender.com");
+        geode::utils::web::openLinkInBrowser("https://dashchat-rsuk.onrender.com");
     }
 };

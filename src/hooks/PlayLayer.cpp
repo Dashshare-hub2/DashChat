@@ -25,7 +25,7 @@ class $modify(MyPlayLayer, PlayLayer) {
             return;
         }
 
-        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumPadEnter) && m_fields->m_chatOverlay->isTyping()) {
+        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
             m_fields->m_chatOverlay->toggleTyping(false);
             return;
         }
