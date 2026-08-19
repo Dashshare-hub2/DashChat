@@ -38,5 +38,11 @@ setup_geode_mod(${MOD_ID}
     src/hooks/PlayLayer.cpp
     src/hooks/PauseLayer.cpp
 )
-
+if(APPLE)
+    target_link_libraries(DashChat PRIVATE "-Wl,-undefined,dynamic_lookup")
+    set_target_properties(DashChat PROPERTIES
+        ENABLE_EXPORTS TRUE
+        XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING "NO"
+    )
+endif()
 target_link_libraries(${MOD_ID} ixwebsocket)
