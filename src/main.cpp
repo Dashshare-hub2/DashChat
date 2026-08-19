@@ -1,5 +1,5 @@
 #include <Geode/Geode.hpp>
-#include <Geode/loader/Mod.hpp>
+#include <Geode/entry.hpp>
 #include "Network/WebSocketManager.hpp"
 
 using namespace geode::prelude;
