@@ -1,6 +1,8 @@
 #include "ChatOverlay.hpp"
 #include "../Network/WebSocketManager.hpp"
 
+using namespace geode::prelude;
+
 ChatOverlay* ChatOverlay::create(std::string const& levelID) {
     auto ret = new ChatOverlay();
     if (ret && ret->init(levelID)) {
@@ -13,17 +15,16 @@ ChatOverlay* ChatOverlay::create(std::string const& levelID) {
 
 bool ChatOverlay::init(std::string const& levelID) {
     if (!CCNode::init()) return false;
-    m_levelID = levelID;
-
-    float width = 220.0f;
-    float height = 110.0f;
-    this->setContentSize({width, height});
 
     m_messages = CCArray::create();
     m_messages->retain();
 
-    auto bg = CCLayerColor::create(ccc4(0, 0, 0, 120), width, height);
-    bg->setIgnoreAnchorPointForPosition(false);
+    float width = 300.0f;
+    float height = 150.0f;
+    this->setContentSize({width, height});
+
+    auto bg = CCLayerColor::create(ccc4(0, 0, 0, 150), width, height);
+    bg->ignoreAnchorPointForPosition(false);
     bg->setAnchorPoint({0.0f, 0.0f});
     bg->setZOrder(-1);
     this->addChild(bg);
@@ -34,7 +35,6 @@ bool ChatOverlay::init(std::string const& levelID) {
     m_container->setContentSize({width, height - 25.0f});
     this->addChild(m_container);
 
-    // Dùng TextInput wrapper chính thức từ Geode UI
     m_inputField = TextInput::create(width - 10.0f, "Press '/' to chat...", "chatFont.fnt");
     m_inputField->setPosition({width / 2.0f, 12.0f});
     m_inputField->setVisible(false);
@@ -67,29 +67,27 @@ void ChatOverlay::addMessage(std::string const& username, std::string const& mes
 }
 
 void ChatOverlay::updateLayout() {
-    float currentY = 0.0f;
+    float y = 0.0f;
     for (int i = m_messages->count() - 1; i >= 0; --i) {
         auto cell = static_cast<ChatCell*>(m_messages->objectAtIndex(i));
-        cell->setPosition({5.0f, currentY});
-        currentY += cell->getContentSize().height + 2.0f;
+        cell->setPosition({10.0f, y});
+        y += 20.0f;
     }
 }
 
-void ChatOverlay::toggleInput(bool enable) {
-    m_isTyping = enable;
-    m_inputField->setVisible(enable);
-    if (enable) {
-        m_inputField->onClickTrackNode(true);
-    } else {
-        m_inputField->onClickTrackNode(false);
+void ChatOverlay::toggleTyping(bool typing) {
+    m_isTyping = typing;
+    m_inputField->setVisible(typing);
+
+    if (m_inputField && m_inputField->getInputNode()) {
+        m_inputField->getInputNode()->onClickTrackNode(typing);
     }
 }
 
-void ChatOverlay::sendCurrentMessage() {
-    std::string text = m_inputField->getString();
-    if (!text.empty()) {
-        WebSocketManager::get().sendMessage(text, m_levelID);
-        m_inputField->setString("");
-    }
-    toggleInput(false);
+bool ChatOverlay::isTyping() const {
+    return m_isTyping;
+}
+
+ChatOverlay::~ChatOverlay() {
+    CC_SAFE_RELEASE(m_messages);
 }

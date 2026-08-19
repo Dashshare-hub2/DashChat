@@ -1,8 +1,10 @@
 #include "ChatCell.hpp"
 
-ChatCell* ChatCell::create(std::string const& username, std::string const& message, ccColor3B userColor) {
+using namespace geode::prelude;
+
+ChatCell* ChatCell::create(std::string const& sender, std::string const& text, ccColor3B color) {
     auto ret = new ChatCell();
-    if (ret && ret->init(username, message, userColor)) {
+    if (ret && ret->init(sender, text, color)) {
         ret->autorelease();
         return ret;
     }
@@ -10,35 +12,22 @@ ChatCell* ChatCell::create(std::string const& username, std::string const& messa
     return nullptr;
 }
 
-bool ChatCell::init(std::string const& username, std::string const& message, ccColor3B userColor) {
-    if (!CCNodeRGBA::init()) return false;
+bool ChatCell::init(std::string const& sender, std::string const& text, ccColor3B color) {
+    if (!CCNode::init()) return false;
 
-    float cellWidth = 210.0f;
-    float padding = 4.0f;
-
-  
-    m_bg = CCLayerColor::create(ccc4(0, 0, 0, 90), cellWidth, 18.0f);
-    m_bg->setIgnoreAnchorPointForPosition(false);
+    m_bg = CCLayerColor::create(ccc4(0, 0, 0, 100), 280.0f, 20.0f);
+    m_bg->ignoreAnchorPointForPosition(false);
     m_bg->setAnchorPoint({0.0f, 0.0f});
-    this->addChild(m_bg, -1);
+    this->addChild(m_bg);
 
-    std::string userStr = username + ": ";
-    m_usernameLabel = CCLabelBMFont::create(userStr.c_str(), "chatFont.fnt");
-    m_usernameLabel->setScale(0.35f);
-    m_usernameLabel->setColor(userColor);
-    m_usernameLabel->setAnchorPoint({0.0f, 0.5f});
+    std::string formatted = sender + ": " + text;
+    m_label = CCLabelBMFont::create(formatted.c_str(), "chatFont.fnt");
+    m_label->setColor(color);
+    m_label->setAnchorPoint({0.0f, 0.5f});
+    m_label->setPosition({5.0f, 10.0f});
+    m_label->setScale(0.5f);
+    this->addChild(m_label);
 
-    m_messageLabel = CCLabelBMFont::create(message.c_str(), "chatFont.fnt");
-    m_messageLabel->setScale(0.35f);
-    m_messageLabel->setAnchorPoint({0.0f, 0.5f});
-
-    float userWidth = m_usernameLabel->getScaledContentSize().width;
-    m_usernameLabel->setPosition({padding, 9.0f});
-    m_messageLabel->setPosition({padding + userWidth, 9.0f});
-
-    this->addChild(m_usernameLabel);
-    this->addChild(m_messageLabel);
-
-    this->setContentSize({cellWidth, 18.0f});
+    this->setContentSize({280.0f, 20.0f});
     return true;
 }

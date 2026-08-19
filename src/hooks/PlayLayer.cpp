@@ -1,7 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include "../UI/ChatOverlay.hpp"
-#include "../Network/WebSocketManager.hpp"
 
 using namespace geode::prelude;
 
@@ -13,33 +12,24 @@ class $modify(MyPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
-        WebSocketManager::get().connect();
-
-        std::string levelID = std::to_string(level->m_levelID.value());
-        auto overlay = ChatOverlay::create(levelID);
-        overlay->setID("dashchat-overlay"_spr);
-
-        auto winSize = CCDirector::sharedDirector()->getWinSize();
-        overlay->setPosition({winSize.width - 230.0f, 40.0f});
-        overlay->setZOrder(99999); 
-
-        this->addChild(overlay);
-        m_fields->m_chatOverlay = overlay;
+        m_fields->m_chatOverlay = ChatOverlay::create(std::to_string(level->m_levelID.value()));
+        m_fields->m_chatOverlay->setPosition({10.0f, 10.0f});
+        this->addChild(m_fields->m_chatOverlay, 100);
 
         return true;
     }
 
-    void keyDown(enumKeyCodes key) {
-        if (m_fields->m_chatOverlay) {
-            if (key == KEY_Slash && !m_fields->m_chatOverlay->isTyping()) {
-                m_fields->m_chatOverlay->toggleInput(true);
-                return;
-            }
-            if ((key == KEY_Enter || key == KEY_KeypadEnter) && m_fields->m_chatOverlay->isTyping()) {
-                m_fields->m_chatOverlay->sendCurrentMessage();
-                return;
-            }
+    void keyDown(enumKeyCodes key, bool isRepeat) {
+        if (key == enumKeyCodes::KEY_Slash && !m_fields->m_chatOverlay->isTyping()) {
+            m_fields->m_chatOverlay->toggleTyping(true);
+            return;
         }
-        PlayLayer::keyDown(key);
+
+        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumPadEnter) && m_fields->m_chatOverlay->isTyping()) {
+            m_fields->m_chatOverlay->toggleTyping(false);
+            return;
+        }
+
+        PlayLayer::keyDown(key, isRepeat);
     }
 };

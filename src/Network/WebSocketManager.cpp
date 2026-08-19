@@ -2,6 +2,11 @@
 
 using namespace geode::prelude;
 
+WebSocketManager& WebSocketManager::get() {
+    static WebSocketManager instance;
+    return instance;
+}
+
 void WebSocketManager::connect() {
     if (m_connected) return;
 
@@ -54,4 +59,8 @@ void WebSocketManager::connect() {
     });
 
     m_webSocket.start();
+}
+
+void WebSocketManager::setOnMessage(std::function<void(std::string const&, std::string const&, std::string const&)> callback) {
+    m_onMessageReceived = callback;
 }
