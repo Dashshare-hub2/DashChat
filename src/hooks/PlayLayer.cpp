@@ -15,14 +15,15 @@ class $modify(MyPlayLayer, PlayLayer) {
 
         WebSocketManager::get().connect();
 
+  
         if (auto uiLayer = this->m_uiLayer) {
             std::string levelID = std::to_string(level->m_levelID.value());
             auto overlay = ChatOverlay::create(levelID);
             overlay->setID("dashchat-overlay"_spr);
             
-            auto winSize = CCDirector::sharedDirector()->getWinSize();
-            overlay->setPosition({10.0f, winSize.height - 120.0f});
-            overlay->setZOrder(999);
+
+            overlay->setPosition({10.0f, 40.0f});
+            overlay->setZOrder(9999); 
 
             uiLayer->addChild(overlay);
             m_fields->m_chatOverlay = overlay;
@@ -37,7 +38,7 @@ class $modify(MyPlayLayer, PlayLayer) {
                 m_fields->m_chatOverlay->toggleInput(true);
                 return;
             }
-            if (key == KEY_Enter && m_fields->m_chatOverlay->isTyping()) {
+            if ((key == KEY_Enter || key == KEY_KeypadEnter) && m_fields->m_chatOverlay->isTyping()) {
                 m_fields->m_chatOverlay->sendCurrentMessage();
                 return;
             }

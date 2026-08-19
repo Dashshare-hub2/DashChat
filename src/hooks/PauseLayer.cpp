@@ -9,7 +9,10 @@ class $modify(MyPauseLayer, PauseLayer) {
 
         auto menu = this->getChildByID("left-button-menu");
         if (!menu) {
+
             menu = CCMenu::create();
+            menu->setID("dashchat-left-menu"_spr);
+            menu->setPosition({30.0f, 30.0f});
             this->addChild(menu);
         }
 
