@@ -30,16 +30,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
-setup_geode_mod(${PROJECT_NAME}
+setup_geode_mod(
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-if(TARGET ${GEODE_MOD_TARGET})
-    target_link_libraries(${GEODE_MOD_TARGET} PRIVATE ixwebsocket)
-elseif(TARGET ${PROJECT_NAME})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ixwebsocket)
-else()
-    target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
-endif()
+target_link_libraries(${GEODE_MOD_TARGET} PRIVATE ixwebsocket)
