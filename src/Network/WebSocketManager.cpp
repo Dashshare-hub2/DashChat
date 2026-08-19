@@ -8,10 +8,10 @@ void WebSocketManager::connect() {
     std::string url = Mod::get()->getSettingValue<std::string>("server-url");
     std::string token = Mod::get()->getSettingValue<std::string>("user-token");
 
-    log::debug("Attempting to connect to: {}", url);
+    log::info("DashChat connecting to URL: {}", url);
 
     if (url.empty()) {
-        geode::queueInMainThread([]() {
+        Loader::get()->queueInMainThread([]() {
             Notification::create("DashChat: URL is empty!", NotificationIcon::Error)->show();
         });
         return;
@@ -23,28 +23,28 @@ void WebSocketManager::connect() {
     m_webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         if (msg->type == ix::WebSocketMessageType::Open) {
             m_connected = true;
-            log::info("WebSocket connection established!");
-            
-            geode::queueInMainThread([]() {
+            log::info("DashChat WebSocket Open!");
+
+            Loader::get()->queueInMainThread([]() {
                 Notification::create("DashChat Connected!", NotificationIcon::Success)->show();
             });
         } 
         else if (msg->type == ix::WebSocketMessageType::Close) {
             m_connected = false;
-            log::warn("WebSocket closed: {}", msg->closeInfo.code);
-            
-            geode::queueInMainThread([code = msg->closeInfo.code]() {
-                std::string err = "DashChat Closed: " + std::to_string(code);
-                Notification::create(err, NotificationIcon::Warning)->show();
+            log::warn("DashChat WebSocket Closed: {}", msg->closeInfo.code);
+
+            Loader::get()->queueInMainThread([code = msg->closeInfo.code]() {
+                std::string errStr = "DashChat Closed: " + std::to_string(code);
+                Notification::create(errStr, NotificationIcon::Warning)->show();
             });
         } 
         else if (msg->type == ix::WebSocketMessageType::Error) {
             m_connected = false;
-            log::error("WebSocket Error: {}", msg->errorInfo.reason);
-            
-            geode::queueInMainThread([reason = msg->errorInfo.reason]() {
-                std::string err = "DashChat Error: " + reason;
-                Notification::create(err, NotificationIcon::Error)->show();
+            log::error("DashChat WebSocket Error: {}", msg->errorInfo.reason);
+
+            Loader::get()->queueInMainThread([reason = msg->errorInfo.reason]() {
+                std::string errStr = "DashChat Error: " + reason;
+                Notification::create(errStr, NotificationIcon::Error)->show();
             });
         } 
         else if (msg->type == ix::WebSocketMessageType::Message) {
@@ -55,7 +55,7 @@ void WebSocketManager::connect() {
                 std::string text = data["text"].as_string();
                 std::string color = data.contains("color") ? data["color"].as_string() : "#FFFFFF";
 
-                geode::queueInMainThread([this, sender, text, color]() {
+                Loader::get()->queueInMainThread([this, sender, text, color]() {
                     if (m_onMessageReceived) {
                         m_onMessageReceived(sender, text, color);
                     }
@@ -74,7 +74,9 @@ void WebSocketManager::disconnect() {
 
 void WebSocketManager::sendMessage(std::string const& text, std::string const& levelID) {
     if (!m_connected) {
-        Notification::create("Cannot send: Disconnected!", NotificationIcon::Error)->show();
+        Loader::get()->queueInMainThread([]() {
+            Notification::create("Cannot send: Disconnected!", NotificationIcon::Error)->show();
+        });
         return;
     }
 
