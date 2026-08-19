@@ -30,7 +30,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
-setup_geode_mod(
+setup_geode_mod(${PROJECT_NAME}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
@@ -38,8 +38,8 @@ setup_geode_mod(
 
 if(TARGET ${GEODE_MOD_TARGET})
     target_link_libraries(${GEODE_MOD_TARGET} PRIVATE ixwebsocket)
-elseif(TARGET daianhnguyen.dashchat)
-    target_link_libraries(daianhnguyen.dashchat PRIVATE ixwebsocket)
+elseif(TARGET ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ixwebsocket)
 else()
     target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
 endif()
