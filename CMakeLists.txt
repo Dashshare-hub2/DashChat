@@ -21,18 +21,22 @@ if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable")
 else()
     message(STATUS "Found Geode: $ENV{GEODE_SDK}")
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/geode-sdk-clone/CMakeLists.txt")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/geode-sdk-clone")
+elseif(EXISTS "$ENV{GEODE_SDK}/CMakeLists.txt")
     list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
 endif()
 
 find_package(Geode REQUIRED)
 
+set(GEODE_MOD_ID "daianhnguyen.dashchat")
 
-set(MOD_ID "daianhnguyen.dashchat")
-
-setup_geode_mod(${MOD_ID}
+setup_geode_mod(${GEODE_MOD_ID}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-target_link_libraries(${MOD_ID} PRIVATE ixwebsocket)
+target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
