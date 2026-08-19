@@ -30,10 +30,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
-setup_geode_mod(
+set(MOD_ID "daianhnguyen.dashchat")
+
+setup_geode_mod(${MOD_ID}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
+target_link_libraries(${MOD_ID} PRIVATE ixwebsocket)
