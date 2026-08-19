@@ -1,40 +1,28 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
+#include <ixwebsocket/IXWebSocket.h>
 #include <string>
-#include <vector>
-#include <memory>
-
-namespace ix {
-    class WebSocket;
-}
-
-struct ChatMessage {
-    std::string sender;
-    std::string discordUser;
-    std::string message;
-};
+#include <functional>
+#include <mutex>
 
 class ChatManager {
 private:
-    std::unique_ptr<ix::WebSocket> m_webSocket;
-    bool m_connected = false;
-    bool m_joined = false;
-    std::vector<ChatMessage> m_messages;
+    ixwebsocket::WebSocket m_webSocket;
+    bool m_isConnected = false;
+    std::mutex m_callbackMutex;
+    
+    std::function<void(const std::string&, const std::string&, bool)> m_onMessageCallback;
 
-    ChatManager();
-    ~ChatManager();
+    ChatManager() = default;
 
 public:
     static ChatManager* get();
 
     void connect();
     void disconnect();
-    void joinWithInvite(const std::string& inviteCode);
-    void linkDiscord(const std::string& discordUsername, const std::string& discordId);
-    void sendMessage(const std::string& msg);
+    void sendMessage(const std::string& message);
     
-    const std::vector<ChatMessage>& getMessages() const { return m_messages; }
-    bool isConnected() const { return m_connected; }
-    bool isJoined() const { return m_joined; }
+    void setOnMessageCallback(std::function<void(const std::string&, const std::string&, bool)> cb);
+    bool isConnected() const { return m_isConnected; }
 };

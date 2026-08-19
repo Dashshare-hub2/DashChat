@@ -1,18 +1,7 @@
 #include "ChatManager.hpp"
-#include <ixwebsocket/IXWebSocket.h>
-#include <Geode/Geode.hpp>
+#include <fmt/format.h>
 
 using namespace geode::prelude;
-
-ChatManager::ChatManager() {
-    m_webSocket = std::make_unique<ix::WebSocket>();
-}
-
-ChatManager::~ChatManager() {
-    if (m_webSocket) {
-        m_webSocket->stop();
-    }
-}
 
 ChatManager* ChatManager::get() {
     static ChatManager instance;
@@ -20,105 +9,88 @@ ChatManager* ChatManager::get() {
 }
 
 void ChatManager::connect() {
-    bool enabled = Mod::get()->getSettingValue<bool>("enable-chat");
-    if (!enabled || m_connected) return;
+    bool enableChat = Mod::get()->getSettingValue<bool>("enable-chat");
+    if (!enableChat) {
+        log::info("[DashChat] Chat disconnected");
+        disconnect();
+        return;
+    }
+
 
     std::string serverUrl = Mod::get()->getSettingValue<std::string>("server-url");
-    m_webSocket->setUrl(serverUrl);
+    std::string inviteCode = Mod::get()->getSettingValue<std::string>("invite-code");
 
-    m_webSocket->setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
-        if (msg->type == ix::WebSocketMessageType::Open) {
-            m_connected = true;
-            log::info("Connected to DashChat server!");
-            
-            // Lấy Invite Code từ Mod Settings và tự động tham gia
-            std::string code = Mod::get()->getSettingValue<std::string>("invite-code");
-            joinWithInvite(code);
+    auto am = GJAccountManager::sharedState();
+    std::string username = am->m_username.empty() ? "Player" : am->m_username;
+    int accountID = am->m_accountID;
+
+    if (serverUrl.empty()) {
+        log::error("[DashChat] empty server");
+        return;
+    }
+
+ 
+    disconnect();
+
+  
+    std::string fullUrl = fmt::format("{}/chat?room={}&user={}&account_id={}", 
+        serverUrl, inviteCode, username, accountID
+    );
+
+    log::info("[DashChat] Connecting: {}", fullUrl);
+    m_webSocket.setUrl(fullUrl);
+
+    m_webSocket.setOnMessageCallback([this](const ixwebsocket::WebSocketMessagePtr& msg) {
+        if (msg->type == ixwebsocket::WebSocketMessageType::Message) {
+            std::string payload = msg->str;
+            log::info("[DashChat] message: {}", payload);
+
+            Loader::get()->queueInMainThread([this, payload]() {
+                std::lock_guard<std::mutex> lock(m_callbackMutex);
+                if (m_onMessageCallback) {
+                    size_t pos = payload.find(": ");
+                    if (pos != std::string::npos) {
+                        std::string sender = payload.substr(0, pos);
+                        std::string content = payload.substr(pos + 2);
+                        bool isDiscord = (sender.find("[Discord]") != std::string::npos);
+                        m_onMessageCallback(sender, content, isDiscord);
+                    } else {
+                        m_onMessageCallback("System", payload, false);
+                    }
+                }
+            });
         } 
-        else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
-            m_connected = false;
-            m_joined = false;
-            log::error("WebSocket Error/Close: {}", msg->errorInfo.reason);
+        else if (msg->type == ixwebsocket::WebSocketMessageType::Open) {
+            m_isConnected = true;
+            log::info("[DashChat] connected!");
         } 
-        else if (msg->type == ix::WebSocketMessageType::Message) {
-            auto parseResult = matjson::parse(msg->str);
-            if (!parseResult.is_ok()) return;
-
-            auto json = parseResult.unwrap();
-            std::string type = json["type"].as_string();
-
-            if (type == "join_success") {
-                m_joined = true;
-                std::string notice = json["message"].as_string();
-                Loader::get()->queueInMainThread([notice]() {
-                    Notification::create(notice, NotificationIcon::Success)->show();
-                });
-            }
-            else if (type == "chat_message") {
-                std::string sender = json["sender"].as_string();
-                std::string discordUser = json.contains("discordUser") && !json["discordUser"].is_null() 
-                                         ? json["discordUser"].as_string() : "";
-                std::string message = json["message"].as_string();
-
-                Loader::get()->queueInMainThread([this, sender, discordUser, message]() {
-                    m_messages.push_back({sender, discordUser, message});
-                });
-            }
-            else if (type == "error") {
-                std::string err = json["message"].as_string();
-                Loader::get()->queueInMainThread([err]() {
-                    Notification::create(err, NotificationIcon::Error)->show();
-                });
-            }
+        else if (msg->type == ixwebsocket::WebSocketMessageType::Close || 
+                 msg->type == ixwebsocket::WebSocketMessageType::Error) {
+            m_isConnected = false;
+            log::warn("[DashChat] disconnected.");
         }
     });
 
-    m_webSocket->start();
+    m_webSocket.start();
 }
 
 void ChatManager::disconnect() {
-    if (m_webSocket && m_connected) {
-        m_webSocket->stop();
-        m_connected = false;
-        m_joined = false;
+    if (m_isConnected) {
+        m_webSocket.stop();
+        m_isConnected = false;
+        log::info("[DashChat] Disconnected to WS.");
     }
 }
 
-void ChatManager::joinWithInvite(const std::string& inviteCode) {
-    if (!m_connected) return;
-
-    std::string gdName = GJAccountManager::get()->m_username.empty() 
-                         ? "Player" 
-                         : GJAccountManager::get()->m_username.c_str();
-
-    matjson::Value json;
-    json["type"] = "join_invite";
-    json["inviteCode"] = inviteCode;
-    json["gdName"] = gdName;
-
-    m_webSocket->send(json.dump());
+void ChatManager::sendMessage(const std::string& message) {
+    if (m_isConnected && m_webSocket.getReadyState() == ixwebsocket::ReadyState::Open) {
+        m_webSocket.send(message);
+    } else {
+        log::warn("[DashChat] Unable connect!");
+    }
 }
 
-void ChatManager::linkDiscord(const std::string& discordUsername, const std::string& discordId) {
-    if (!m_connected) return;
-
-    std::string gdName = GJAccountManager::get()->m_username.c_str();
-
-    matjson::Value json;
-    json["type"] = "link_discord";
-    json["gdName"] = gdName;
-    json["discordUsername"] = discordUsername;
-    json["discordId"] = discordId;
-
-    m_webSocket->send(json.dump());
-}
-
-void ChatManager::sendMessage(const std::string& msg) {
-    if (!m_connected || !m_joined) return;
-
-    matjson::Value json;
-    json["type"] = "chat_message";
-    json["message"] = msg;
-
-    m_webSocket->send(json.dump());
+void ChatManager::setOnMessageCallback(std::function<void(const std::string&, const std::string&, bool)> cb) {
+    std::lock_guard<std::mutex> lock(m_callbackMutex);
+    m_onMessageCallback = cb;
 }

@@ -1,33 +1,31 @@
 {
-  "geode": "5.9.0",
-  "gd": {
-    "win": "2.2081",
+	"geode": "v3.8.0",
+	"gd": {
     "mac": "2.2081",
+    "win": "2.2081",
+    "ios": "2.2081",
     "android": "2.2081"
-  },
-  "id": "daianhnguyen.dashchat",
-  "name": "DashChat",
-  "version": "v1.0.0",
-  "developer": "daianhnguyen",
-  "description": "Real-time global chat with Discord integration and server invites.",
-  "settings": {
-    "server-url": {
-      "name": "Server URL",
-      "description": "WebSocket Server Address",
-      "type": "string",
-      "default": "ws://dashchat-rsuk.onrender.com"
-    },
-    "invite-code": {
-      "name": "Invite Code",
-      "description": "Invite code to chat",
-      "type": "string",
-      "default": "DASH-GLOBAL-CHAT"
-    },
-    "enable-chat": {
-      "name": "Enable Chat",
-      "description": "Connect/Disconncet to chat",
-      "type": "bool",
-      "default": true
-    }
   }
+	"id": "daianhnguyen.dashchat",
+	"name": "DashChat",
+	"version": "v1.0.0",
+	"developer": "daianhnguyen",
+	"description": "Global Realtime Chat Mod for Geometry Dash",
+	"settings": {
+		"server-url": {
+			"name": "Server URL",
+			"type": "string",
+			"default": "ws://dashchat-rsuk.onrender.com"
+		},
+		"invite-code": {
+			"name": "Invite Code",
+			"type": "string",
+			"default": "DASH-GLOBAL-CHAT"
+		},
+		"enable-chat": {
+			"name": "Enable Chat",
+			"type": "bool",
+			"default": true
+		}
+	}
 }
