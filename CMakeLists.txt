@@ -27,8 +27,6 @@ endif()
 
 set(MOD_ID "daianhnguyen.dashchat")
 
-add_library(${MOD_ID} SHARED)
-
 setup_geode_mod(${MOD_ID}
    SOURCES
     src/main.cpp
