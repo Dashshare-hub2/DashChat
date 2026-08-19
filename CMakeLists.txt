@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(dashchat VERSION 1.0.0 LANGUAGES CXX)
+project(DashChat VERSION 1.0.0 LANGUAGES CXX)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable")
@@ -30,7 +30,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
-setup_geode_mod(dashchat
+setup_geode_mod(DashChat
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
