@@ -47,14 +47,20 @@ class $modify(DashChatPauseLayer, PauseLayer) {
             spr, this, menu_selector(DashChatPauseLayer::onOpenDashChat)
         );
 
-
         auto dashChatMenu = CCMenu::create();
         dashChatMenu->setID("dashchat-pause-menu");
 
-        dashChatMenu->setPosition({35.f, 35.f});
+   
+        dashChatMenu->setPosition({ 35.f, 35.f });
         dashChatMenu->addChild(btn);
 
-        this->addChild(dashChatMenu, 999); 
+        if (this->m_mainLayer) {
+            this->m_mainLayer->addChild(dashChatMenu, 999);
+        } else {
+            auto winSize = CCDirector::sharedDirector()->getWinSize();
+            dashChatMenu->setPosition({ winSize.width / 2.0f - 180.f, winSize.height / 2.0f - 100.f });
+            this->addChild(dashChatMenu, 999);
+        }
     }
 
     void onOpenDashChat(CCObject*) {
