@@ -9,7 +9,7 @@ $on_mod_loaded {
     log::info("   DASHCHAT ENTRY POINT EXECUTED!       ");
     log::info("==========================================");
 
-    Loader::get()->queueInMainThread([]() {
+    geode::queueInMainThread([]() {
         Notification::create("DashChat v1.0.0 Loaded!", NotificationIcon::Success)->show();
         WebSocketManager::get().connect();
     });

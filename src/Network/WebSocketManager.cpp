@@ -11,7 +11,7 @@ void WebSocketManager::connect() {
     log::info("DashChat attempting connection to: {}", url);
 
     if (url.empty()) {
-        Loader::get()->queueInMainThread([]() {
+        geode::queueInMainThread([]() {
             Notification::create("DashChat: URL empty!", NotificationIcon::Error)->show();
         });
         return;
@@ -23,26 +23,28 @@ void WebSocketManager::connect() {
         if (msg->type == ix::WebSocketMessageType::Open) {
             m_connected = true;
             log::info("DashChat WebSocket Open!");
-            Loader::get()->queueInMainThread([]() {
+            geode::queueInMainThread([]() {
                 Notification::create("DashChat Connected!", NotificationIcon::Success)->show();
             });
         }
         else if (msg->type == ix::WebSocketMessageType::Error) {
             m_connected = false;
             log::error("DashChat Error: {}", msg->errorInfo.reason);
-            Loader::get()->queueInMainThread([reason = msg->errorInfo.reason]() {
+            geode::queueInMainThread([reason = msg->errorInfo.reason]() {
                 Notification::create("DashChat Err: " + reason, NotificationIcon::Error)->show();
             });
         }
         else if (msg->type == ix::WebSocketMessageType::Message) {
             auto jsonResult = matjson::parse(msg->str);
-            if (jsonResult.is_ok()) {
+            
+            if (jsonResult.isOk()) {
                 auto data = jsonResult.unwrap();
-                std::string sender = data["sender"].as_string();
-                std::string text = data["text"].as_string();
-                std::string color = data.contains("color") ? data["color"].as_string() : "#FFFFFF";
+                
+                std::string sender = data["sender"].asString().unwrapOrDefault();
+                std::string text = data["text"].asString().unwrapOrDefault();
+                std::string color = data.contains("color") ? data["color"].asString().unwrapOrDefault() : "#FFFFFF";
 
-                Loader::get()->queueInMainThread([this, sender, text, color]() {
+                geode::queueInMainThread([this, sender, text, color]() {
                     if (m_onMessageReceived) {
                         m_onMessageReceived(sender, text, color);
                     }
