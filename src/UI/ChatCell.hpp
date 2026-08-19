@@ -3,8 +3,9 @@
 
 using namespace geode::prelude;
 
-class ChatCell : public CCNode {
+class ChatCell : public CCNodeRGBA {
 protected:
+    CCLayerColor* m_bg = nullptr;
     CCLabelBMFont* m_usernameLabel = nullptr;
     CCLabelBMFont* m_messageLabel = nullptr;
 
@@ -12,4 +13,5 @@ protected:
 
 public:
     static ChatCell* create(std::string const& username, std::string const& message, ccColor3B userColor = {255, 255, 255});
+    void setCellOpacity(GLubyte opacity);
 };

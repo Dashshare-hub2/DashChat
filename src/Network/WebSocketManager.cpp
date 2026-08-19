@@ -9,7 +9,9 @@ void WebSocketManager::connect() {
     std::string token = Mod::get()->getSettingValue<std::string>("user-token");
 
     if (url.empty()) {
-        Notification::create("DashChat: Server URL is empty!", NotificationIcon::Error)->show();
+        geode::queueInMainThread([]() {
+            Notification::create("DashChat: URL is empty!", NotificationIcon::Error)->show();
+        });
         return;
     }
 
@@ -22,17 +24,22 @@ void WebSocketManager::connect() {
             geode::queueInMainThread([]() {
                 Notification::create("DashChat Connected!", NotificationIcon::Success)->show();
             });
-        } else if (msg->type == ix::WebSocketMessageType::Close) {
-            m_connected = false;
-            geode::queueInMainThread([]() {
-                Notification::create("DashChat Disconnected!", NotificationIcon::Warning)->show();
-            });
-        } else if (msg->type == ix::WebSocketMessageType::Error) {
+        } 
+        else if (msg->type == ix::WebSocketMessageType::Close) {
             m_connected = false;
             geode::queueInMainThread([msg]() {
-                Notification::create("DashChat Connection Failed!", NotificationIcon::Error)->show();
+                std::string errStr = "DashChat Disconnected: " + std::to_string(msg->closeInfo.code);
+                Notification::create(errStr, NotificationIcon::Warning)->show();
             });
-        } else if (msg->type == ix::WebSocketMessageType::Message) {
+        } 
+        else if (msg->type == ix::WebSocketMessageType::Error) {
+            m_connected = false;
+            geode::queueInMainThread([msg]() {
+                std::string errStr = "DashChat Error: " + msg->errorInfo.reason;
+                Notification::create(errStr, NotificationIcon::Error)->show();
+            });
+        } 
+        else if (msg->type == ix::WebSocketMessageType::Message) {
             auto jsonResult = matjson::parse(msg->str);
             if (jsonResult.is_ok()) {
                 auto data = jsonResult.unwrap();
@@ -59,7 +66,7 @@ void WebSocketManager::disconnect() {
 
 void WebSocketManager::sendMessage(std::string const& text, std::string const& levelID) {
     if (!m_connected) {
-        Notification::create("Not connected to DashChat server!", NotificationIcon::Error)->show();
+        Notification::create("Cannot send: Disconnected!", NotificationIcon::Error)->show();
         return;
     }
 
