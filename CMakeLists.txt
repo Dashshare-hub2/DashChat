@@ -33,8 +33,8 @@ setup_geode_mod(${MOD_ID}
    SOURCES
     src/main.cpp
     src/Network/WebSocketManager.cpp
-    src/UI/ChatCell.cpp
     src/UI/ChatOverlay.cpp
+    src/UI/ChatCell.cpp
     src/hooks/PlayLayer.cpp
     src/hooks/PauseLayer.cpp
 )
