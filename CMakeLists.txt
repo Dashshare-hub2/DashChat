@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(DashChat VERSION 1.0.0 LANGUAGES CXX)
@@ -17,26 +17,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
-if (NOT DEFINED ENV{GEODE_SDK})
-    message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/geode-sdk-clone/CMakeLists.txt")
+    add_subdirectory(geode-sdk-clone ${CMAKE_CURRENT_BINARY_DIR}/geode)
+elseif(DEFINED ENV{GEODE_SDK} AND EXISTS "$ENV{GEODE_SDK}/CMakeLists.txt")
+    add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 else()
-    message(STATUS "Found Geode: $ENV{GEODE_SDK}")
+    message(FATAL_ERROR "Unable to find Geode SDK source directory!")
 endif()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/geode-sdk-clone/CMakeLists.txt")
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/geode-sdk-clone")
-elseif(EXISTS "$ENV{GEODE_SDK}/CMakeLists.txt")
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
-endif()
+set(MOD_ID "daianhnguyen.dashchat")
 
-find_package(Geode REQUIRED)
+add_library(${MOD_ID} SHARED)
 
-set(GEODE_MOD_ID "daianhnguyen.dashchat")
-
-setup_geode_mod(${GEODE_MOD_ID}
+setup_geode_mod(${MOD_ID}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
+target_link_libraries(${MOD_ID} PRIVATE ixwebsocket)
