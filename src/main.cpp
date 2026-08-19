@@ -36,6 +36,7 @@ class $modify(DashChatMenuLayer, MenuLayer) {
     }
 };
 
+
 class $modify(DashChatPauseLayer, PauseLayer) {
     void customSetup() {
         PauseLayer::customSetup();
@@ -47,20 +48,19 @@ class $modify(DashChatPauseLayer, PauseLayer) {
             spr, this, menu_selector(DashChatPauseLayer::onOpenDashChat)
         );
 
-        auto dashChatMenu = CCMenu::create();
-        dashChatMenu->setID("dashchat-pause-menu");
+        auto chatMenu = CCMenu::create();
+        chatMenu->setID("dashchat-pause-menu");
+        chatMenu->addChild(btn);
 
-   
-        dashChatMenu->setPosition({ 35.f, 35.f });
-        dashChatMenu->addChild(btn);
+        auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        if (this->m_mainLayer) {
-            this->m_mainLayer->addChild(dashChatMenu, 999);
-        } else {
-            auto winSize = CCDirector::sharedDirector()->getWinSize();
-            dashChatMenu->setPosition({ winSize.width / 2.0f - 180.f, winSize.height / 2.0f - 100.f });
-            this->addChild(dashChatMenu, 999);
-        }
+
+        float xPos = (winSize.width / 2.0f) - 185.0f;
+        float yPos = (winSize.height / 2.0f) - 105.0f;
+
+        chatMenu->setPosition({ xPos, yPos });
+
+        this->addChild(chatMenu, 999);
     }
 
     void onOpenDashChat(CCObject*) {
