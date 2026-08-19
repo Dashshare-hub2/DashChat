@@ -31,8 +31,7 @@ add_library(${MOD_ID} SHARED)
 
 setup_geode_mod(${MOD_ID}
     SOURCES
-        src/main.cpp
-        src/ChatManager.cpp
+        src/*.cpp
 )
 
 target_link_libraries(${MOD_ID} ixwebsocket)
