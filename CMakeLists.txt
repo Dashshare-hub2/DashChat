@@ -25,16 +25,17 @@ set(USE_TLS OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     ixwebsocket
-    GIT_REPOSITORY https://github.com/machinezone/ixwebsocket.git
+    GIT_REPOSITORY https://github.com/machinezone/IXWebSocket.git
     GIT_TAG v11.4.4
 )
 FetchContent_MakeAvailable(ixwebsocket)
 
+set(MOD_ID "daianhnguyen.dashchat")
 
-setup_geode_mod(DashChat
+setup_geode_mod(${MOD_ID}
     SOURCES
         src/main.cpp
         src/ChatManager.cpp
 )
 
-target_link_libraries(DashChat PRIVATE ixwebsocket)
+target_link_libraries(${MOD_ID} PRIVATE ixwebsocket)
