@@ -30,19 +30,11 @@ else()
     find_package(Geode REQUIRED)
 endif()
 
+set(MOD_TARGET "daianhnguyen.dashchat")
 
-setup_geode_mod(DashChat
-    SOURCES
-        src/main.cpp
-        src/ChatManager.cpp
+target_sources(${MOD_TARGET} PRIVATE
+    src/main.cpp
+    src/ChatManager.cpp
 )
 
-if(TARGET ${GEODE_MOD_BINARY_NAME})
-    target_link_libraries(${GEODE_MOD_BINARY_NAME} PRIVATE ixwebsocket)
-elseif(TARGET ${GEODE_MOD_ID})
-    target_link_libraries(${GEODE_MOD_ID} PRIVATE ixwebsocket)
-elseif(TARGET DashChat)
-    target_link_libraries(DashChat PRIVATE ixwebsocket)
-else()
-    geode_target_link_libraries(PRIVATE ixwebsocket)
-endif()
+target_link_libraries(${MOD_TARGET} PRIVATE ixwebsocket)
