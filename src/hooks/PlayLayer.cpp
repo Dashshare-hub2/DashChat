@@ -15,17 +15,18 @@ class $modify(MyPlayLayer, PlayLayer) {
 
         WebSocketManager::get().connect();
 
-        if (auto uiLayer = this->m_uiLayer) {
-            std::string levelID = std::to_string(level->m_levelID.value());
-            auto overlay = ChatOverlay::create(levelID);
-            overlay->setID("dashchat-overlay"_spr);
-            
-            overlay->setPosition({10.0f, 35.0f});
-            overlay->setZOrder(9999);
+        CCNode* parentNode = this->m_uiLayer ? static_cast<CCNode*>(this->m_uiLayer) : static_cast<CCNode*>(this);
 
-            uiLayer->addChild(overlay);
-            m_fields->m_chatOverlay = overlay;
-        }
+        std::string levelID = std::to_string(level->m_levelID.value());
+        auto overlay = ChatOverlay::create(levelID);
+        overlay->setID("dashchat-overlay"_spr);
+        
+
+        overlay->setPosition({10.0f, 40.0f});
+        overlay->setZOrder(99999); 
+
+        parentNode->addChild(overlay);
+        m_fields->m_chatOverlay = overlay;
 
         return true;
     }
