@@ -3,6 +3,10 @@
 
 using namespace geode::prelude;
 
-$execute {
-    log::info("DashChat initialized!");
+$on_mod_loaded {
+    log::info("DashChat entry point triggered!");
+    
+    geode::queueInMainThread([]() {
+        WebSocketManager::get().connect();
+    });
 }

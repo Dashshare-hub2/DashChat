@@ -15,17 +15,16 @@ class $modify(MyPlayLayer, PlayLayer) {
 
         WebSocketManager::get().connect();
 
-        CCNode* targetParent = m_uiLayer ? static_cast<CCNode*>(m_uiLayer) : static_cast<CCNode*>(this);
-
         std::string levelID = std::to_string(level->m_levelID.value());
         auto overlay = ChatOverlay::create(levelID);
         overlay->setID("dashchat-overlay"_spr);
-        
+
         auto winSize = CCDirector::sharedDirector()->getWinSize();
-        overlay->setPosition({winSize.width - 210.0f, 40.0f});
+        
+        overlay->setPosition({winSize.width - 230.0f, 50.0f});
         overlay->setZOrder(99999);
 
-        targetParent->addChild(overlay);
+        this->addChild(overlay);
         m_fields->m_chatOverlay = overlay;
 
         return true;

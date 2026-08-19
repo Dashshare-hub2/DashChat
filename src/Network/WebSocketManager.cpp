@@ -8,6 +8,8 @@ void WebSocketManager::connect() {
     std::string url = Mod::get()->getSettingValue<std::string>("server-url");
     std::string token = Mod::get()->getSettingValue<std::string>("user-token");
 
+    log::debug("Attempting to connect to: {}", url);
+
     if (url.empty()) {
         geode::queueInMainThread([]() {
             Notification::create("DashChat: URL is empty!", NotificationIcon::Error)->show();
@@ -21,22 +23,28 @@ void WebSocketManager::connect() {
     m_webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         if (msg->type == ix::WebSocketMessageType::Open) {
             m_connected = true;
+            log::info("WebSocket connection established!");
+            
             geode::queueInMainThread([]() {
                 Notification::create("DashChat Connected!", NotificationIcon::Success)->show();
             });
         } 
         else if (msg->type == ix::WebSocketMessageType::Close) {
             m_connected = false;
-            geode::queueInMainThread([msg]() {
-                std::string errStr = "DashChat Disconnected: " + std::to_string(msg->closeInfo.code);
-                Notification::create(errStr, NotificationIcon::Warning)->show();
+            log::warn("WebSocket closed: {}", msg->closeInfo.code);
+            
+            geode::queueInMainThread([code = msg->closeInfo.code]() {
+                std::string err = "DashChat Closed: " + std::to_string(code);
+                Notification::create(err, NotificationIcon::Warning)->show();
             });
         } 
         else if (msg->type == ix::WebSocketMessageType::Error) {
             m_connected = false;
-            geode::queueInMainThread([msg]() {
-                std::string errStr = "DashChat Error: " + msg->errorInfo.reason;
-                Notification::create(errStr, NotificationIcon::Error)->show();
+            log::error("WebSocket Error: {}", msg->errorInfo.reason);
+            
+            geode::queueInMainThread([reason = msg->errorInfo.reason]() {
+                std::string err = "DashChat Error: " + reason;
+                Notification::create(err, NotificationIcon::Error)->show();
             });
         } 
         else if (msg->type == ix::WebSocketMessageType::Message) {
