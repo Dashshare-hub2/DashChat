@@ -5,10 +5,12 @@
 using namespace geode::prelude;
 
 $on_mod_loaded {
-    log::info("DashChat binary loaded successfully!");
+    log::info("==========================================");
+    log::info("   DASHCHAT ENTRY POINT EXECUTED!       ");
+    log::info("==========================================");
 
     Loader::get()->queueInMainThread([]() {
-        Notification::create("DashChat v1.0.0 Ready!", NotificationIcon::Success)->show();
+        Notification::create("DashChat v1.0.0 Loaded!", NotificationIcon::Success)->show();
         WebSocketManager::get().connect();
     });
 }
