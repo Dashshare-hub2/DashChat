@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
-#include <Geode/modify/PauseLayer.hpp> 
+#include <Geode/modify/PauseLayer.hpp>
 #include <Geode/loader/SettingEvent.hpp>
 
 #include "ChatManager.hpp"
@@ -41,26 +41,20 @@ class $modify(DashChatPauseLayer, PauseLayer) {
         PauseLayer::customSetup();
 
         auto spr = CCSprite::createWithSpriteFrameName("GJ_chatBtn_001.png");
-        if (!spr) spr = ButtonSprite::create("Chat");
+        if (!spr) spr = ButtonSprite::create("Chat", "goldFont.fnt", "GJ_button_01.png", 0.8f);
 
         auto btn = CCMenuItemSpriteExtra::create(
             spr, this, menu_selector(DashChatPauseLayer::onOpenDashChat)
         );
 
-        auto rightMenu = this->getChildByID("right-button-menu");
-        if (!rightMenu) {
-            rightMenu = this->getChildByID("bottom-right-menu");
-        }
 
-        if (rightMenu) {
-            rightMenu->addChild(btn);
-            rightMenu->updateLayout();
-        } else {
-            auto menu = CCMenu::create();
-            menu->setPosition({CCDirector::sharedDirector()->getWinSize().width - 40.f, 100.f});
-            menu->addChild(btn);
-            this->addChild(menu);
-        }
+        auto dashChatMenu = CCMenu::create();
+        dashChatMenu->setID("dashchat-pause-menu");
+
+        dashChatMenu->setPosition({35.f, 35.f});
+        dashChatMenu->addChild(btn);
+
+        this->addChild(dashChatMenu, 999); 
     }
 
     void onOpenDashChat(CCObject*) {
