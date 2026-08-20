@@ -12,8 +12,14 @@ class $modify(MyPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
+        auto winSize = CCDirector::sharedDirector()->getWinSize();
+
         m_fields->m_chatOverlay = ChatOverlay::create(std::to_string(level->m_levelID.value()));
-        m_fields->m_chatOverlay->setPosition({10.0f, 10.0f});
+        
+        float xPos = winSize.width - 190.0f;
+        float yPos = winSize.height - 100.0f;
+        
+        m_fields->m_chatOverlay->setPosition({xPos, yPos});
         this->addChild(m_fields->m_chatOverlay, 100);
 
         return true;

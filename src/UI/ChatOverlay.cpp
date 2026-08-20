@@ -19,24 +19,27 @@ bool ChatOverlay::init(std::string const& levelID) {
     m_messages = CCArray::create();
     m_messages->retain();
 
-    float width = 300.0f;
-    float height = 150.0f;
+    float width = 180.0f;
+    float height = 90.0f;
     this->setContentSize({width, height});
 
-    auto bg = CCLayerColor::create(ccc4(0, 0, 0, 150), width, height);
+    auto bg = CCLayerColor::create(ccc4(0, 0, 0, 120), width, height);
     bg->ignoreAnchorPointForPosition(false);
     bg->setAnchorPoint({0.0f, 0.0f});
     bg->setZOrder(-1);
     this->addChild(bg);
 
     m_container = CCMenu::create();
-    m_container->setPosition({0.0f, 25.0f});
+    m_container->setPosition({0.0f, 22.0f});
     m_container->setAnchorPoint({0.0f, 0.0f});
-    m_container->setContentSize({width, height - 25.0f});
+    m_container->setContentSize({width, height - 22.0f});
     this->addChild(m_container);
 
+    // Ô nhập tin nhắn nhỏ gọn hơn
     m_inputField = TextInput::create(width - 10.0f, "Press '/' to chat...", "chatFont.fnt");
-    m_inputField->setPosition({width / 2.0f, 12.0f});
+    m_inputField->setPosition({width / 2.0f, 11.0f});
+    m_inputField->setScale(0.7f);
+    m_inputField->setDelegate(this);
     m_inputField->setVisible(false);
     this->addChild(m_inputField);
 
@@ -57,7 +60,7 @@ void ChatOverlay::addMessage(std::string const& username, std::string const& mes
     m_container->addChild(cell);
     m_messages->addObject(cell);
 
-    if (m_messages->count() > 6) {
+    if (m_messages->count() > 4) {
         auto firstCell = static_cast<ChatCell*>(m_messages->objectAtIndex(0));
         m_container->removeChild(firstCell, true);
         m_messages->removeObjectAtIndex(0);
@@ -70,8 +73,8 @@ void ChatOverlay::updateLayout() {
     float y = 0.0f;
     for (int i = m_messages->count() - 1; i >= 0; --i) {
         auto cell = static_cast<ChatCell*>(m_messages->objectAtIndex(i));
-        cell->setPosition({10.0f, y});
-        y += 20.0f;
+        cell->setPosition({5.0f, y});
+        y += 15.0f;
     }
 }
 
@@ -79,8 +82,18 @@ void ChatOverlay::toggleTyping(bool typing) {
     m_isTyping = typing;
     m_inputField->setVisible(typing);
 
-    if (m_inputField && m_inputField->getInputNode()) {
-        m_inputField->getInputNode()->onClickTrackNode(typing);
+    if (typing) {
+        m_inputField->onClickTrackNode(true);
+    } else {
+        m_inputField->onClickTrackNode(false);
+        this->sendMessage();
+    }
+}
+
+void ChatOverlay::sendMessage() {
+    std::string text = m_inputField->getString();
+    if (!text.empty()) {
+        m_inputField->setString("");
     }
 }
 

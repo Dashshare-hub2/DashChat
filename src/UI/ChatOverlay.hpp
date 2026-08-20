@@ -2,7 +2,7 @@
 #include <Geode/Geode.hpp>
 #include "ChatCell.hpp"
 
-class ChatOverlay : public cocos2d::CCNode {
+class ChatOverlay : public cocos2d::CCNode, public geode::TextInputDelegate {
 private:
     cocos2d::CCArray* m_messages = nullptr;
     cocos2d::CCMenu* m_container = nullptr;
@@ -15,6 +15,9 @@ public:
     void addMessage(std::string const& username, std::string const& message, cocos2d::ccColor3B color);
     void updateLayout();
     void toggleTyping(bool typing);
+    void sendMessage();
     bool isTyping() const;
+
+    virtual void textChanged(geode::TextInput* input) override {}
     ~ChatOverlay();
 };
