@@ -12,6 +12,8 @@ class $modify(MyPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
+        this->setKeyboardEnabled(true);
+
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
         m_fields->m_chatOverlay = ChatOverlay::create(std::to_string(level->m_levelID.value()));
@@ -23,13 +25,6 @@ class $modify(MyPlayLayer, PlayLayer) {
         this->addChild(m_fields->m_chatOverlay, 9999);
 
         return true;
-    }
-
-    void customSetup() {
-        PlayLayer::customSetup();
-        
-
-        this->setKeyboardEnabled(true);
     }
 
     void keyDown(enumKeyCodes key, bool isRepeat) {
@@ -44,6 +39,7 @@ class $modify(MyPlayLayer, PlayLayer) {
                 m_fields->m_chatOverlay->toggleTyping(false);
                 return;
             }
+
 
             if (m_fields->m_chatOverlay->isTyping()) {
                 return;
