@@ -3,7 +3,7 @@
 
 using namespace geode::prelude;
 
-$on_mod_loaded {
+$execute {
     log::info("==========================================");
     log::info("   DASHCHAT ENTRY POINT EXECUTED!       ");
     log::info("==========================================");
