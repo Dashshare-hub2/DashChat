@@ -20,14 +20,12 @@
       "name": "User Session Token",
       "type": "string",
       "default": ""
-    }
-  },
-  "keybinds": [
-    {
-      "id": "toggle-chat",
-      "name": "Toggle Chat Overlay",
-      "description": "Press to toggle chat input box",
+    },
+    "toggle-chat-key": {
+      "type": "keybind",
+      "name": "Toggle Chat Key",
+      "description": "Enble/Disable Chat",
       "default": "Tab"
     }
-  ]
+  }
 	}

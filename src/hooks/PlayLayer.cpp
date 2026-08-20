@@ -1,8 +1,10 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <geode.keybinds/include/Keybinds.hpp>
 #include "../UI/ChatOverlay.hpp"
 
 using namespace geode::prelude;
+using namespace keybinds;
 
 class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
@@ -11,8 +13,6 @@ class $modify(MyPlayLayer, PlayLayer) {
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-
-        this->setKeyboardEnabled(true);
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -24,23 +24,32 @@ class $modify(MyPlayLayer, PlayLayer) {
         m_fields->m_chatOverlay->setPosition({xPos, yPos});
         this->addChild(m_fields->m_chatOverlay, 9999);
 
+        this->template addEventListener<InvokeBindFilter>(
+            [this](InvokeBindEvent* event) {
+                if (event->isDown() && m_fields->m_chatOverlay) {
+                    bool isTyping = m_fields->m_chatOverlay->isTyping();
+                    m_fields->m_chatOverlay->toggleTyping(!isTyping);
+                }
+                return ListenerResult::Stop;
+            },
+            "toggle-chat-key"
+        );
+
         return true;
     }
 
-void keyDown(enumKeyCodes key, bool isRepeat) {
-    if (m_fields->m_chatOverlay) {
-      
-        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
-            m_fields->m_chatOverlay->toggleTyping(false); 
-            return;
+    void keyDown(enumKeyCodes key, bool isRepeat) {
+        if (m_fields->m_chatOverlay) {
+            if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
+                m_fields->m_chatOverlay->toggleTyping(false);
+                return;
+            }
+
+            if (m_fields->m_chatOverlay->isTyping()) {
+                return;
+            }
         }
 
-
-        if (m_fields->m_chatOverlay->isTyping()) {
-            return;
-        }
+        PlayLayer::keyDown(key, isRepeat);
     }
-
-    PlayLayer::keyDown(key, isRepeat);
-}
 };
