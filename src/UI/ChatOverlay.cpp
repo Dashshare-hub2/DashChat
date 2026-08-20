@@ -35,12 +35,17 @@ bool ChatOverlay::init(std::string const& levelID) {
     m_container->setContentSize({width, height - 22.0f});
     this->addChild(m_container);
 
-    // Ô nhập tin nhắn nhỏ gọn hơn
+    // Ô nhập tin nhắn
     m_inputField = TextInput::create(width - 10.0f, "Press '/' to chat...", "chatFont.fnt");
     m_inputField->setPosition({width / 2.0f, 11.0f});
     m_inputField->setScale(0.7f);
-    m_inputField->setDelegate(this);
     m_inputField->setVisible(false);
+
+    // Sử dụng setCallback để bắt sự kiện thay đổi text/enter thay vì Delegate
+    m_inputField->setCallback([this](std::string const& text) {
+        // Callback kích hoạt mỗi khi người dùng thay đổi text hoặc nhấn Submit
+    });
+
     this->addChild(m_inputField);
 
     WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& msg, std::string const& hexColor) {
@@ -83,9 +88,9 @@ void ChatOverlay::toggleTyping(bool typing) {
     m_inputField->setVisible(typing);
 
     if (typing) {
-        m_inputField->onClickTrackNode(true);
+        m_inputField->setTouchEnabled(true);
     } else {
-        m_inputField->onClickTrackNode(false);
+        m_inputField->setTouchEnabled(false);
         this->sendMessage();
     }
 }
