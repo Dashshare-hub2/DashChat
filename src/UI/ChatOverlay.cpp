@@ -34,7 +34,7 @@ bool ChatOverlay::init(std::string const& levelID) {
     m_container->setAnchorPoint({0.0f, 0.0f});
     m_container->setContentSize({width, height - 25.0f});
     this->addChild(m_container);
-    m_inputField = TextInput::create(width - 10.0f, "Ctrl+D (or Cmd+D) to chat...", "chatFont.fnt");
+    m_inputField = TextInput::create(width - 10.0f, "TAB to chat...", "chatFont.fnt");
     m_inputField->setPosition({width / 2.0f, 12.0f});
     m_inputField->setScale(0.65f);
     

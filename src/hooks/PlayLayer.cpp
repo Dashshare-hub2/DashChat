@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/loader/Event.hpp>
 #include "../UI/ChatOverlay.hpp"
 
 using namespace geode::prelude;
@@ -7,10 +8,14 @@ using namespace geode::prelude;
 class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
         ChatOverlay* m_chatOverlay = nullptr;
+        EventListener<EventFilter<KeybindPressEvent>> m_keyListener;
     };
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+
+        this->setKeyboardEnabled(true);
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -25,26 +30,24 @@ class $modify(MyPlayLayer, PlayLayer) {
         return true;
     }
 
-    void keyDown(enumKeyCodes key, bool isRepeat) {
-        if (!m_fields->m_chatOverlay) {
-            PlayLayer::keyDown(key, isRepeat);
-            return;
-        }
 
-        if (key == enumKeyCodes::KEY_Tab) {
-            bool currentTyping = m_fields->m_chatOverlay->isTyping();
-            m_fields->m_chatOverlay->toggleTyping(!currentTyping);
-            return;
-        }
+    void keyDown(enumKeyCodes key, bool isRepeat) override {
+        if (m_fields->m_chatOverlay) {
 
-        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
-            m_fields->m_chatOverlay->toggleTyping(false);
-            return;
-        }
+            if (key == enumKeyCodes::KEY_Tab) {
+                bool isTyping = m_fields->m_chatOverlay->isTyping();
+                m_fields->m_chatOverlay->toggleTyping(!isTyping);
+                return; 
+            }
 
+            if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
+                m_fields->m_chatOverlay->toggleTyping(false);
+                return;
+            }
 
-        if (m_fields->m_chatOverlay->isTyping()) {
-            return;
+            if (m_fields->m_chatOverlay->isTyping()) {
+                return;
+            }
         }
 
         PlayLayer::keyDown(key, isRepeat);
