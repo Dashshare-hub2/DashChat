@@ -52,4 +52,4 @@ if(APPLE)
         XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING "NO"
     )
 endif()
-target_link_libraries(${MOD_ID} ixwebsocket geode.custom-keybind)
+target_link_libraries(${MOD_ID} ixwebsocket)
