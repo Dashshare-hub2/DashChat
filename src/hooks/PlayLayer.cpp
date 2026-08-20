@@ -27,13 +27,14 @@ class $modify(MyPlayLayer, PlayLayer) {
         return true;
     }
 
-    void keyDown(enumKeyCodes key, bool isRepeat) override {
+    void keyDown(enumKeyCodes key, bool isRepeat) {
         if (m_fields->m_chatOverlay) {
             if (key == enumKeyCodes::KEY_Tab) {
                 bool isTyping = m_fields->m_chatOverlay->isTyping();
                 m_fields->m_chatOverlay->toggleTyping(!isTyping);
-                return; 
+                return;
             }
+
 
             if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
                 m_fields->m_chatOverlay->toggleTyping(false);
