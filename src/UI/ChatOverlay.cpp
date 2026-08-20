@@ -86,7 +86,9 @@ void ChatOverlay::toggleTyping(bool typing) {
 
     if (typing) {
         m_inputField->setEnabled(true);
+        m_inputField->onClickTrackNode(true); 
     } else {
+        m_inputField->onClickTrackNode(false);
         m_inputField->setEnabled(false);
         this->sendMessage();
     }

@@ -8,16 +8,12 @@ project(DashChat VERSION 1.0.0 LANGUAGES CXX)
 include(FetchContent)
 
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(USE_TLS ON CACHE BOOL "" FORCE)
-set(USE_OPENSSL OFF CACHE BOOL "" FORCE)
-set(USE_MBED_TLS OFF CACHE BOOL "" FORCE)
 
 if(APPLE)
     set(USE_APPLE_SSL ON CACHE BOOL "" FORCE)
 endif()
 
 if(ANDROID)
-    set(USE_MBED_TLS ON CACHE BOOL "" FORCE)
     set(ENABLE_MBEDTLS_TESTS OFF CACHE BOOL "" FORCE)
 endif()
 
@@ -25,6 +21,10 @@ FetchContent_Declare(
     ixwebsocket
     GIT_REPOSITORY https://github.com/machinezone/IXWebSocket.git
     GIT_TAG v11.4.4
+    OPTIONS
+        "USE_TLS ON"
+        "USE_OPENSSL OFF"
+        "USE_MBED_TLS OFF"
 )
 FetchContent_MakeAvailable(ixwebsocket)
 

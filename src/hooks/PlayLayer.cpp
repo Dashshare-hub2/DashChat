@@ -20,19 +20,30 @@ class $modify(MyPlayLayer, PlayLayer) {
         float yPos = winSize.height - 100.0f;
         
         m_fields->m_chatOverlay->setPosition({xPos, yPos});
-        this->addChild(m_fields->m_chatOverlay, 100);
+        this->addChild(m_fields->m_chatOverlay, 999);
 
         return true;
     }
 
     void keyDown(enumKeyCodes key, bool isRepeat) {
-        if (key == enumKeyCodes::KEY_Slash && !m_fields->m_chatOverlay->isTyping()) {
-            m_fields->m_chatOverlay->toggleTyping(true);
+        if (!m_fields->m_chatOverlay) {
+            PlayLayer::keyDown(key, isRepeat);
             return;
         }
 
+
+        if ((key == enumKeyCodes::KEY_Slash || key == enumKeyCodes::KEY_C) && !m_fields->m_chatOverlay->isTyping()) {
+            m_fields->m_chatOverlay->toggleTyping(true);
+            return; 
+        }
+
+
         if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
             m_fields->m_chatOverlay->toggleTyping(false);
+            return;
+        }
+
+        if (m_fields->m_chatOverlay->isTyping()) {
             return;
         }
 
