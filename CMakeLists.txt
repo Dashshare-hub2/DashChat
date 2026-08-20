@@ -8,9 +8,9 @@ project(DashChat VERSION 1.0.0 LANGUAGES CXX)
 include(FetchContent)
 
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(USE_TLS ON CACHE BOOL "" FORCE)
 
 if(APPLE)
+    set(USE_TLS ON CACHE BOOL "" FORCE)
     set(USE_APPLE_SSL ON CACHE BOOL "" FORCE)
 endif()
 
