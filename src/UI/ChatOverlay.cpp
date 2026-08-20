@@ -79,9 +79,9 @@ void ChatOverlay::toggleTyping(bool typing) {
 
     if (auto inputNode = m_inputField->getInputNode()) {
         if (typing) {
-            inputNode->onClickTrackNode(true);
+            inputNode->attachWithIME();
         } else {
-            inputNode->onClickTrackNode(false);
+            inputNode->detachWithIME();
             this->sendMessage();
         }
     }
