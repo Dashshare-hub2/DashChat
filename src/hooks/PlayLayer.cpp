@@ -27,25 +27,20 @@ class $modify(MyPlayLayer, PlayLayer) {
         return true;
     }
 
-    void keyDown(enumKeyCodes key, bool isRepeat) {
-        if (m_fields->m_chatOverlay) {
-            if (key == enumKeyCodes::KEY_Tab) {
-                bool isTyping = m_fields->m_chatOverlay->isTyping();
-                m_fields->m_chatOverlay->toggleTyping(!isTyping);
-                return;
-            }
-
-            if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
-                m_fields->m_chatOverlay->toggleTyping(false);
-                return;
-            }
-
-
-            if (m_fields->m_chatOverlay->isTyping()) {
-                return;
-            }
+void keyDown(enumKeyCodes key, bool isRepeat) {
+    if (m_fields->m_chatOverlay) {
+      
+        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
+            m_fields->m_chatOverlay->toggleTyping(false); 
+            return;
         }
 
-        PlayLayer::keyDown(key, isRepeat);
+
+        if (m_fields->m_chatOverlay->isTyping()) {
+            return;
+        }
     }
+
+    PlayLayer::keyDown(key, isRepeat);
+}
 };

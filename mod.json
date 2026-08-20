@@ -22,6 +22,12 @@
       "description": "Paste your authentication token received from Discord OAuth.",
       "type": "string",
       "default": ""
+    },
+    "toggle-chat-key": {
+      "name": "Toggle Chat Key",
+      "description": "Phim tat de mo/dong khung chat trong game",
+      "type": "custom",
+      "default": "Tab"
     }
 	}
 }

@@ -13,5 +13,6 @@ private:
 public:
     static WebSocketManager& get();
     void connect();
+    void send(std::string const& text); 
     void setOnMessage(std::function<void(std::string const&, std::string const&, std::string const&)> callback);
 };
