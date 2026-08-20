@@ -1,5 +1,8 @@
 #include "WebSocketManager.hpp"
+#include <Geode/Geode.hpp>
 #include <matjson.hpp>
+
+using namespace geode::prelude;
 
 WebSocketManager& WebSocketManager::get() {
     static WebSocketManager instance;
@@ -12,43 +15,39 @@ void WebSocketManager::connect() {
     std::string baseUrl = Mod::get()->getSettingValue<std::string>("server-url");
     std::string token = Mod::get()->getSettingValue<std::string>("user-token");
 
-    if (baseUrl.empty()) return;
+    if (baseUrl.empty()) {
+        baseUrl = "wss://dashchat-rsuk.onrender.com";
+    }
 
-    if (baseUrl.back() == '/') baseUrl.pop_back();
-    std::string fullUrl = baseUrl + "/?token=" + token;
+    m_webSocket.setUrl(baseUrl);
 
-    m_webSocket.setUrl(fullUrl);
-
-    ix::SocketTLSOptions tlsOptions;
-    tlsOptions.tls = true;
-    m_webSocket.setTLSOptions(tlsOptions);
-
-    m_webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
-        if (msg->type == ix::WebSocketMessageType::Open) {
+    m_webSocket.setOnMessageCallback([this](ix::WebSocketMessageType type, const std::string& str, size_t, const ix::WebSocketErrorInfo& errorInfo, size_t) {
+        if (type == ix::WebSocketMessageType::Open) {
             m_connected = true;
-            geode::queueInMainThread([]() {
+            geode::Loader::get()->queueInMainThread([]() {
                 Notification::create("DashChat Connected!", NotificationIcon::Success)->show();
             });
-        }
-        else if (msg->type == ix::WebSocketMessageType::Error) {
+        } 
+        else if (type == ix::WebSocketMessageType::Close || type == ix::WebSocketMessageType::Error) {
             m_connected = false;
-            geode::queueInMainThread([reason = msg->errorInfo.reason]() {
+            std::string reason = errorInfo.reason.empty() ? "Disconnected" : errorInfo.reason;
+            geode::Loader::get()->queueInMainThread([reason]() {
                 Notification::create("DashChat Err: " + reason, NotificationIcon::Error)->show();
             });
-        }
-        else if (msg->type == ix::WebSocketMessageType::Message) {
-            auto jsonResult = matjson::parse(msg->str);
-            if (jsonResult.isOk()) {
-                auto data = jsonResult.unwrap();
-                std::string sender = data["sender"].asString().unwrapOrDefault();
-                std::string text = data["text"].asString().unwrapOrDefault();
-                std::string color = data.contains("color") ? data["color"].asString().unwrapOrDefault() : "#FFFFFF";
+        } 
+        else if (type == ix::WebSocketMessageType::Message) {
+            auto parseResult = matjson::parse(str);
+            if (parseResult.isOk()) {
+                auto json = parseResult.unwrap();
+                std::string sender = json["sender"].asString().unwrapOrDefault("Unknown");
+                std::string text = json["text"].asString().unwrapOrDefault("");
+                std::string color = json["color"].asString().unwrapOrDefault("#FFFFFF");
 
-                geode::queueInMainThread([this, sender, text, color]() {
-                    if (m_onMessageReceived) {
+                if (m_onMessageReceived) {
+                    geode::Loader::get()->queueInMainThread([this, sender, text, color]() {
                         m_onMessageReceived(sender, text, color);
-                    }
-                });
+                    });
+                }
             }
         }
     });
@@ -58,7 +57,7 @@ void WebSocketManager::connect() {
 
 void WebSocketManager::setOnMessage(std::function<void(std::string const&, std::string const&, std::string const&)> callback) {
     m_onMessageReceived = callback;
-    m_webSocket.send(json.dump());
+}
 
 void WebSocketManager::send(std::string const& text) {
     if (!m_connected || text.empty()) return;
