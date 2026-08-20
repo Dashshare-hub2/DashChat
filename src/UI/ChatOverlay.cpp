@@ -5,10 +5,8 @@ using namespace geode::prelude;
 
 void ChatOverlay::sendMessage() {
     std::string text = m_inputField->getString();
-    
     if (!text.empty()) {
         WebSocketManager::get().send(text);
-
         m_inputField->setString("");
     }
 }
@@ -22,7 +20,7 @@ void ChatOverlay::toggleTyping(bool typing) {
             inputNode->attachWithIME();
         } else {
             inputNode->detachWithIME();
-            this->sendMessage(); 
+            this->sendMessage();
         }
     }
 }

@@ -20,12 +20,6 @@
       "name": "User Session Token",
       "type": "string",
       "default": ""
-    },
-    "toggle-chat-key": {
-      "type": "keybind",
-      "name": "Toggle Chat Key",
-      "description": "Enble/Disable Chat",
-      "default": "Tab"
     }
   }
-	}
+}
