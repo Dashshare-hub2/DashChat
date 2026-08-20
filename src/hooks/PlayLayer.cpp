@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <geode.keybinds/include/Keybinds.hpp>
+#include <geode.custom-keybinds/include/Keybinds.hpp>
 #include "../UI/ChatOverlay.hpp"
 
 using namespace geode::prelude;
