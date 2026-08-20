@@ -12,7 +12,6 @@ class $modify(MyPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
-        
         if (level) {
             this->setKeyboardEnabled(true);
 
@@ -33,8 +32,7 @@ class $modify(MyPlayLayer, PlayLayer) {
     }
 
     void keyDown(enumKeyCodes key, bool isRepeat) {
- 
-        if (m_fields && m_fields->m_chatOverlay) {
+        if (m_fields->m_chatOverlay) {
             if (key == enumKeyCodes::KEY_Tab) {
                 bool isTyping = m_fields->m_chatOverlay->isTyping();
                 m_fields->m_chatOverlay->toggleTyping(!isTyping);
