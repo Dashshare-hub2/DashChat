@@ -31,15 +31,20 @@ class $modify(MyPlayLayer, PlayLayer) {
             return;
         }
 
+        auto dispatcher = CCDirector::sharedDirector()->getKeyboardDispatcher();
+        bool isControlPressed = dispatcher->getControlKeyPressed() || dispatcher->getCommandKeyPressed();
 
-        if ((key == enumKeyCodes::KEY_Slash || key == enumKeyCodes::KEY_C) && !m_fields->m_chatOverlay->isTyping()) {
-            m_fields->m_chatOverlay->toggleTyping(true);
-            return; 
+        if (isControlPressed && key == enumKeyCodes::KEY_D) {
+            if (!m_fields->m_chatOverlay->isTyping()) {
+                m_fields->m_chatOverlay->toggleTyping(true);
+            }
+            return;
         }
 
-
-        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
-            m_fields->m_chatOverlay->toggleTyping(false);
+        if (isControlPressed && (key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter)) {
+            if (m_fields->m_chatOverlay->isTyping()) {
+                m_fields->m_chatOverlay->toggleTyping(false);
+            }
             return;
         }
 
