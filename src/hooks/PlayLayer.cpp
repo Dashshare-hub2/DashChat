@@ -1,6 +1,5 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <Geode/binding/CCKeyboardDispatcher.hpp>
 #include "../UI/ChatOverlay.hpp"
 
 using namespace geode::prelude;
@@ -8,7 +7,6 @@ using namespace geode::prelude;
 class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
         ChatOverlay* m_chatOverlay = nullptr;
-        bool m_isCmdOrCtrlPressed = false;
     };
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -32,30 +30,23 @@ class $modify(MyPlayLayer, PlayLayer) {
             PlayLayer::keyDown(key, isRepeat);
             return;
         }
-        if (key == enumKeyCodes::KEY_LeftControl || key == enumKeyCodes::KEY_RightControl ||
-            key == enumKeyCodes::KEY_LeftCommand || key == enumKeyCodes::KEY_RightCommand) {
-            m_fields->m_isCmdOrCtrlPressed = true;
-        }
 
-        if (m_fields->m_isCmdOrCtrlPressed && key == enumKeyCodes::KEY_D) {
-            if (!m_fields->m_chatOverlay->isTyping()) {
-                m_fields->m_chatOverlay->toggleTyping(true);
-            }
+        if (key == enumKeyCodes::KEY_Tab) {
+            bool currentTyping = m_fields->m_chatOverlay->isTyping();
+            m_fields->m_chatOverlay->toggleTyping(!currentTyping);
             return;
         }
+
+        if ((key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_NumEnter) && m_fields->m_chatOverlay->isTyping()) {
+            m_fields->m_chatOverlay->toggleTyping(false);
+            return;
+        }
+
 
         if (m_fields->m_chatOverlay->isTyping()) {
             return;
         }
 
         PlayLayer::keyDown(key, isRepeat);
-    }
-
-    void keyUp(enumKeyCodes key) {
-        if (key == enumKeyCodes::KEY_LeftControl || key == enumKeyCodes::KEY_RightControl ||
-            key == enumKeyCodes::KEY_LeftCommand || key == enumKeyCodes::KEY_RightCommand) {
-            m_fields->m_isCmdOrCtrlPressed = false;
-        }
-        PlayLayer::keyUp(key);
     }
 };
