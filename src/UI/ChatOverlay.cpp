@@ -23,35 +23,30 @@ bool ChatOverlay::init(std::string const& levelID) {
     float height = 90.0f;
     this->setContentSize({width, height});
 
-    auto bg = CCLayerColor::create(ccc4(0, 0, 0, 120), width, height);
+    auto bg = CCLayerColor::create(ccc4(0, 0, 0, 150), width, height);
     bg->ignoreAnchorPointForPosition(false);
     bg->setAnchorPoint({0.0f, 0.0f});
     bg->setZOrder(-1);
     this->addChild(bg);
 
     m_container = CCMenu::create();
-    m_container->setPosition({0.0f, 22.0f});
+    m_container->setPosition({0.0f, 25.0f});
     m_container->setAnchorPoint({0.0f, 0.0f});
-    m_container->setContentSize({width, height - 22.0f});
+    m_container->setContentSize({width, height - 25.0f});
     this->addChild(m_container);
-
     m_inputField = TextInput::create(width - 10.0f, "Ctrl+D to chat...", "chatFont.fnt");
-    m_inputField->setPosition({width / 2.0f, 11.0f});
-    m_inputField->setScale(0.7f);
-    m_inputField->setVisible(false);
+    m_inputField->setPosition({width / 2.0f, 12.0f});
+    m_inputField->setScale(0.65f);
+    
+    m_inputField->setVisible(true);
     m_inputField->setEnabled(false);
 
-    this->addChild(m_inputField);
-
-    WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& msg, std::string const& hexColor) {
-        ccColor3B col = {255, 255, 255};
-        if (hexColor == "#FF0000") col = {255, 0, 0};
-        else if (hexColor == "#00FF00") col = {0, 255, 0};
-        this->addMessage(sender, msg, col);
-    });
+    this->addChild(m_inputField, 10);
 
     return true;
 }
+
+
 
 void ChatOverlay::addMessage(std::string const& username, std::string const& message, ccColor3B color) {
     auto cell = ChatCell::create(username, message, color);
@@ -80,18 +75,15 @@ void ChatOverlay::updateLayout() {
 
 void ChatOverlay::toggleTyping(bool typing) {
     m_isTyping = typing;
-    m_inputField->setVisible(typing);
     m_inputField->setEnabled(typing);
 
-    if (typing) {
-        if (auto inputNode = m_inputField->getInputNode()) {
+    if (auto inputNode = m_inputField->getInputNode()) {
+        if (typing) {
             inputNode->onClickTrackNode(true);
-        }
-    } else {
-        if (auto inputNode = m_inputField->getInputNode()) {
+        } else {
             inputNode->onClickTrackNode(false);
+            this->sendMessage();
         }
-        this->sendMessage();
     }
 }
 

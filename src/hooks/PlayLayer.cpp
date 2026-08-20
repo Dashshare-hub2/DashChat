@@ -10,20 +10,21 @@ class $modify(MyPlayLayer, PlayLayer) {
     };
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+    if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
-        auto winSize = CCDirector::sharedDirector()->getWinSize();
+    auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        m_fields->m_chatOverlay = ChatOverlay::create(std::to_string(level->m_levelID.value()));
-        
-        float xPos = winSize.width - 190.0f;
-        float yPos = winSize.height - 100.0f;
-        
-        m_fields->m_chatOverlay->setPosition({xPos, yPos});
-        this->addChild(m_fields->m_chatOverlay, 999);
+    m_fields->m_chatOverlay = ChatOverlay::create(std::to_string(level->m_levelID.value()));
+    
+    float xPos = winSize.width - 190.0f;
+    float yPos = winSize.height - 100.0f;
+    
+    m_fields->m_chatOverlay->setPosition({xPos, yPos});
+    
+    this->addChild(m_fields->m_chatOverlay, 9999);
 
-        return true;
-    }
+    return true;
+}
 
     void keyDown(enumKeyCodes key, bool isRepeat) {
         if (!m_fields->m_chatOverlay) {
