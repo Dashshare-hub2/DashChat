@@ -8,7 +8,8 @@ project(DashChat VERSION 1.0.0 LANGUAGES CXX)
 include(FetchContent)
 
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(USE_TLS OFF CACHE BOOL "" FORCE)
+set(USE_TLS ON CACHE BOOL "" FORCE)
+set(USE_MBED_TLS ON CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     ixwebsocket
