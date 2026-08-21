@@ -3,7 +3,7 @@
 #include <Geode/ui/Popup.hpp>
 #include <Geode/ui/TextInput.hpp>
 
-#include <cocos2d-ext.h>
+#include <Geode/cocos/extensions/GUI/CCScrollView/CCScrollView.h>
 
 class ChatOverlay : public geode::Popup<std::string const&> {
 private:
