@@ -14,7 +14,7 @@ ChatOverlay* ChatOverlay::create(std::string const& roomName) {
     return nullptr;
 }
 
-bool ChatOverlay::setup(std::string roomName) {
+bool ChatOverlay::setup(std::string const& roomName) {
     this->setTitle("DashChat - " + roomName);
 
     m_scrollView = cocos2d::extension::CCScrollView::create({ 330.0f, 140.0f });
