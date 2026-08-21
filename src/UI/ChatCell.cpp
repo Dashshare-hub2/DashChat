@@ -1,19 +1,29 @@
-#include <Geode/Geode.hpp>
-#include <Geode/utils/web.hpp>
+#include "ChatCell.hpp"
 
 using namespace geode::prelude;
+
+ChatCell* ChatCell::create() {
+    auto ret = new ChatCell();
+    if (ret && ret->init()) {
+        ret->autorelease();
+        return ret;
+    }
+    CC_SAFE_DELETE(ret);
+    return nullptr;
+}
+
+bool ChatCell::init() {
+    if (!CCNode::init()) return false;
+    return true;
+}
 
 void ChatCell::loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUrl) {
     if (avatarUrl.empty() || !parentNode) return;
 
-    auto req = web::WebRequest();
-    
-    m_listener.spawn(
-        "Loading Avatar",
-        req.get(avatarUrl),
-        [parentNode](web::WebResponse response) {
-            if (response.ok()) {
-                auto data = response.data();
+    m_avatarListener.bind([parentNode](web::WebResponseEvent* event) {
+        if (auto response = event->getValue()) {
+            if (response->ok()) {
+                auto data = response->data();
                 if (!data.empty() && parentNode) {
                     auto image = new CCImage();
                     if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
@@ -33,5 +43,8 @@ void ChatCell::loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUr
                 }
             }
         }
-    );
+    });
+
+    web::WebRequest req;
+    m_avatarListener.setFilter(req.get(avatarUrl));
 }

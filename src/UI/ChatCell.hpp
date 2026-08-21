@@ -4,7 +4,7 @@
 
 class ChatCell : public cocos2d::CCNode { 
 private:
-    geode::async::TaskHolder m_listener;
+    geode::EventListener<geode::utils::web::WebResponseFilter> m_avatarListener;
     cocos2d::CCLayerColor* m_bg = nullptr;
     cocos2d::CCLabelBMFont* m_label = nullptr;
 
