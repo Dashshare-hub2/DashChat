@@ -4,7 +4,7 @@
 
 using namespace geode::prelude;
 
-class $modify(MyPlayLayer, PlayLayer), public cocos2d::CCKeyboardDelegate {
+class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
         ChatOverlay* m_chatOverlay = nullptr;
     };
@@ -13,7 +13,7 @@ class $modify(MyPlayLayer, PlayLayer), public cocos2d::CCKeyboardDelegate {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
         if (level) {
-            CCKeyboardDispatcher::sharedDispatcher()->addDelegate(this);
+            this->setKeyboardEnabled(true);
 
             auto winSize = CCDirector::sharedDirector()->getWinSize();
             auto overlay = ChatOverlay::create(std::to_string(level->m_levelID.value()));
@@ -28,12 +28,7 @@ class $modify(MyPlayLayer, PlayLayer), public cocos2d::CCKeyboardDelegate {
         return true;
     }
 
-    void onExit() {
-        CCKeyboardDispatcher::sharedDispatcher()->removeDelegate(this);
-        PlayLayer::onExit();
-    }
-
-    void keyDown(enumKeyCodes key) override {
+    void keyDown(enumKeyCodes key, bool isRepeat) {
         if (m_fields->m_chatOverlay) {
             if (key == enumKeyCodes::KEY_Tab) {
                 bool isTyping = m_fields->m_chatOverlay->isTyping();
@@ -45,6 +40,12 @@ class $modify(MyPlayLayer, PlayLayer), public cocos2d::CCKeyboardDelegate {
                 m_fields->m_chatOverlay->toggleTyping(false);
                 return;
             }
+
+            if (m_fields->m_chatOverlay->isTyping()) {
+                return;
+            }
         }
+
+        PlayLayer::keyDown(key, isRepeat);
     }
 };
