@@ -6,12 +6,12 @@ using namespace geode::prelude;
 void loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUrl) {
     if (avatarUrl.empty() || !parentNode) return;
 
-    auto listener = new EventListener<web::WebResponseFilter>();
+    auto listener = new EventListener<web::SentWebRequest>();
 
     listener->bind([parentNode, listener](web::WebResponseEvent* event) {
-        if (auto response = event->getValue()) {
-            if (response->ok()) {
-                auto data = response->data();
+        if (auto res = event->getResponse()) {
+            if (res->ok()) {
+                auto data = res->data();
                 if (!data.empty() && parentNode) {
                     auto image = new CCImage();
                     if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
