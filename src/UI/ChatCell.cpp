@@ -6,9 +6,9 @@ using namespace geode::prelude;
 void loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUrl) {
     if (avatarUrl.empty() || !parentNode) return;
 
-    auto listener = new Task<web::WebResponse>::Listener();
+    auto listener = new EventListener<web::WebResponseFilter>();
 
-    listener->bind([parentNode, listener](Task<web::WebResponse>::Event* event) {
+    listener->bind([parentNode, listener](web::WebResponseEvent* event) {
         if (auto response = event->getValue()) {
             if (response->ok()) {
                 auto data = response->data();
