@@ -18,22 +18,26 @@ bool ChatCell::init(std::string const& sender, std::string const& text, cocos2d:
     this->setContentSize({ 300.0f, 30.0f });
 
     auto senderLabel = CCLabelBMFont::create((sender + ": ").c_str(), "chatFont.fnt");
-    senderLabel->setAnchorPoint({ 0.0f, 0.5f });
-    senderLabel->setPosition({ 35.0f, 15.0f });
-    senderLabel->setColor(color);
-    senderLabel->setScale(0.5f);
-    this->addChild(senderLabel);
+    if (senderLabel) {
+        senderLabel->setAnchorPoint({ 0.0f, 0.5f });
+        senderLabel->setPosition({ 35.0f, 15.0f });
+        senderLabel->setColor(color);
+        senderLabel->setScale(0.5f);
+        this->addChild(senderLabel);
 
-    auto textLabel = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
-    textLabel->setAnchorPoint({ 0.0f, 0.5f });
-    textLabel->setPosition({ senderLabel->getPositionX() + senderLabel->getScaledContentSize().width, 15.0f });
-    textLabel->setScale(0.5f);
-    this->addChild(textLabel);
+        auto textLabel = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
+        if (textLabel) {
+            textLabel->setAnchorPoint({ 0.0f, 0.5f });
+            textLabel->setPosition({ senderLabel->getPositionX() + senderLabel->getScaledContentSize().width, 15.0f });
+            textLabel->setScale(0.5f);
+            this->addChild(textLabel);
+        }
+    }
 
     return true;
 }
 
-void ChatCell::loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUrl) {
+void ChatCell::loadDiscordAvatar(cocos2d::CCNode* parentNode, std::string const& avatarUrl) {
     if (avatarUrl.empty() || !parentNode) return;
 
     auto req = web::WebRequest();
