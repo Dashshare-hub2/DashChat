@@ -6,29 +6,36 @@ using namespace geode::prelude;
 void loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUrl) {
     if (avatarUrl.empty() || !parentNode) return;
 
-    geode::async::spawn([parentNode, avatarUrl]() -> geode::async::Task<void> {
-        web::WebRequest req;
-        auto res = co_await req.get(avatarUrl);
-        
-        if (res.ok()) {
-            auto data = res.data();
-            if (!data.empty() && parentNode) {
-                auto image = new CCImage();
-                if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
-                    auto texture = new CCTexture2D();
-                    if (texture->initWithImage(image)) {
-                        auto sprite = CCSprite::createWithTexture(texture);
-                        if (sprite) {
-                            float scale = 20.0f / sprite->getContentSize().width;
-                            sprite->setScale(scale);
-                            sprite->setPosition({ 15.0f, 15.0f });
-                            parentNode->addChild(sprite);
+    auto listener = new EventListener<Task<web::WebResponse>>();
+
+    listener->bind([parentNode, listener](Task<web::WebResponse>::Event* event) {
+        if (auto response = event->getValue()) {
+            if (response->ok()) {
+                auto data = response->data();
+                if (!data.empty()) {
+                    auto image = new CCImage();
+                    if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
+                        auto texture = new CCTexture2D();
+                        if (texture->initWithImage(image)) {
+                            auto sprite = CCSprite::createWithTexture(texture);
+                            if (sprite) {
+                                float scale = 20.0f / sprite->getContentSize().width;
+                                sprite->setScale(scale);
+                                sprite->setPosition({ 15.0f, 15.0f });
+                                parentNode->addChild(sprite);
+                            }
+                            texture->release();
                         }
-                        texture->release();
+                        image->release();
                     }
-                    image->release();
                 }
             }
+            delete listener;
+        } else if (event->isCancelled()) {
+            delete listener;
         }
     });
+
+    web::WebRequest req;
+    listener->setFilter(req.get(avatarUrl));
 }
