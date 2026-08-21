@@ -7,9 +7,12 @@ void loadDiscordAvatar(CCNode* parentNode, std::string const& avatarUrl) {
     if (avatarUrl.empty() || !parentNode) return;
 
     web::WebRequest req;
-    req.get(avatarUrl).listen([parentNode](web::WebResponse* response) {
+    
+    req.get(avatarUrl).send().listen([parentNode](web::WebResponse* response) {
         if (response && response->ok()) {
             auto data = response->data();
+
+            if (data.empty()) return;
 
             auto image = new CCImage();
             if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
