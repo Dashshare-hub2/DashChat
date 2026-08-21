@@ -17,7 +17,7 @@ ChatOverlay* ChatOverlay::create(std::string const& roomName) {
 bool ChatOverlay::setup(std::string const& roomName) {
     this->setTitle("DashChat - " + roomName);
 
-    m_scrollView = CCScrollView::create({ 330.0f, 140.0f });
+    m_scrollView = cocos2d::extension::CCScrollView::create({ 330.0f, 140.0f });
     m_scrollView->setPosition({ 15.0f, 50.0f });
     m_scrollView->setDirection(cocos2d::extension::kCCScrollViewDirectionVertical);
     
@@ -25,13 +25,14 @@ bool ChatOverlay::setup(std::string const& roomName) {
     m_scrollView->setContainer(m_chatContainer);
     this->m_mainLayer->addChild(m_scrollView);
 
+
     auto bg = CCScale9Sprite::create("square02_001.png");
     bg->setContentSize({ 330.0f, 140.0f });
     bg->setPosition({ 180.0f, 120.0f });
     bg->setOpacity(100);
     this->m_mainLayer->addChild(bg, -1);
 
-    m_inputNode = TextInput::create(250.0f, "Message...", "chatFont.fnt");
+    m_inputNode = TextInput::create(250.0f, "Enter the message...", "chatFont.fnt");
     m_inputNode->setPosition({ 140.0f, 25.0f });
     this->m_mainLayer->addChild(m_inputNode);
 
