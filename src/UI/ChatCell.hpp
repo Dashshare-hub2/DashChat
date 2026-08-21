@@ -1,8 +1,10 @@
 #pragma once
 #include <Geode/Geode.hpp>
+#include <Geode/utils/async.hpp>
 
-class ChatCell : public cocos2d::CCNode {
+class ChatCell : public cocos2d::CCNode { 
 private:
+    geode::async::TaskHolder m_listener;
     cocos2d::CCLayerColor* m_bg = nullptr;
     cocos2d::CCLabelBMFont* m_label = nullptr;
 
