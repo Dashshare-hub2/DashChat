@@ -1,16 +1,19 @@
 #pragma once
 #include <Geode/Geode.hpp>
+#include <Geode/ui/Popup.hpp>
+#include <Geode/ui/TextInput.hpp>
 
-class ChatOverlay : public cocos2d::CCNode {
+class ChatOverlay : public geode::Popup<std::string const&> {
 private:
-    bool m_isTyping = false;
-    geode::TextInput* m_inputField = nullptr;
+    cocos2d::CCNode* m_chatContainer = nullptr;
+    geode::TextInput* m_inputNode = nullptr;
+    cocos2d::CCScrollView* m_scrollView = nullptr;
+    float m_chatHeight = 0.0f;
+
+    bool setup(std::string const& roomName) override;
+    void onSend(cocos2d::CCObject* sender);
 
 public:
-    static ChatOverlay* create(std::string const& levelID);
-    
-    bool init(std::string const& levelID);
-    void toggleTyping(bool typing);
-    void sendMessage();
-    bool isTyping() const { return m_isTyping; }
+    static ChatOverlay* create(std::string const& roomName);
+    void addChatMessage(std::string const& sender, std::string const& text, std::string const& avatarUrl);
 };

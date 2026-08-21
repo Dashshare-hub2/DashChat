@@ -1,11 +1,12 @@
 #include "ChatOverlay.hpp"
+#include "ChatCell.hpp"
 #include "../Network/WebSocketManager.hpp"
 
 using namespace geode::prelude;
 
-ChatOverlay* ChatOverlay::create(std::string const& levelID) {
+ChatOverlay* ChatOverlay::create(std::string const& roomName) {
     auto ret = new ChatOverlay();
-    if (ret && ret->init(levelID)) {
+    if (ret && ret->initAnchored(360.0f, 220.0f, roomName)) {
         ret->autorelease();
         return ret;
     }
@@ -13,56 +14,69 @@ ChatOverlay* ChatOverlay::create(std::string const& levelID) {
     return nullptr;
 }
 
-bool ChatOverlay::init(std::string const& levelID) {
-    if (!CCNode::init()) return false;
+bool ChatOverlay::setup(std::string const& roomName) {
+    this->setTitle("DashChat - " + roomName);
 
- 
-    this->setContentSize({ 180.0f, 90.0f });
+    m_scrollView = CCScrollView::create({ 330.0f, 140.0f });
+    m_scrollView->setPosition({ 15.0f, 50.0f });
+    m_scrollView->setDirection(cocos2d::extension::kCCScrollViewDirectionVertical);
+    
+    m_chatContainer = CCNode::create();
+    m_scrollView->setContainer(m_chatContainer);
+    this->m_mainLayer->addChild(m_scrollView);
 
+    auto bg = CCScale9Sprite::create("square02_001.png");
+    bg->setContentSize({ 330.0f, 140.0f });
+    bg->setPosition({ 180.0f, 120.0f });
+    bg->setOpacity(100);
+    this->m_mainLayer->addChild(bg, -1);
 
-    auto bg = CCScale9Sprite::create("square02b_001.png", { 0, 0, 80, 80 });
-    bg->setContentSize(this->getContentSize());
-    bg->setPosition(this->getContentSize() / 2);
-    bg->setOpacity(120); 
-    bg->setColor({ 0, 0, 0 });
-    this->addChild(bg);
+    m_inputNode = TextInput::create(250.0f, "Message...", "chatFont.fnt");
+    m_inputNode->setPosition({ 140.0f, 25.0f });
+    this->m_mainLayer->addChild(m_inputNode);
 
+    auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
+    auto sendBtn = CCMenuItemSpriteExtra::create(sendBtnSprite, this, menu_selector(ChatOverlay::onSend));
+    
+    auto menu = CCMenu::create();
+    menu->setPosition({ 300.0f, 25.0f });
+    menu->addChild(sendBtn);
+    this->m_mainLayer->addChild(menu);
 
-    m_inputField = TextInput::create(170.0f, "Press Tab to chat...", "chatFont.fnt");
-    m_inputField->setPosition({ 90.0f, 15.0f });
-    m_inputField->setMaxCharCount(100);
-    m_inputField->setEnabled(false); 
-    this->addChild(m_inputField);
-
-    WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& text, std::string const& color) {
-        geode::log::info("[Chat] {}: {}", sender, text);
+    WebSocketManager::get().connect();
+    WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& text, std::string const& avatarUrl) {
+        this->addChatMessage(sender, text, avatarUrl);
     });
 
     return true;
 }
 
-void ChatOverlay::sendMessage() {
-    if (!m_inputField) return;
-
-    std::string text = m_inputField->getString();
+void ChatOverlay::onSend(cocos2d::CCObject* sender) {
+    if (!m_inputNode) return;
+    
+    std::string text = m_inputNode->getString();
     if (!text.empty()) {
         WebSocketManager::get().send(text);
-        m_inputField->setString(""); 
+        m_inputNode->setString("");
     }
 }
 
-void ChatOverlay::toggleTyping(bool typing) {
-    m_isTyping = typing;
-    if (!m_inputField) return;
+void ChatOverlay::addChatMessage(std::string const& sender, std::string const& text, std::string const& avatarUrl) {
+    auto cell = ChatCell::create(sender, text, { 255, 255, 255 });
+    if (!cell) return;
 
-    m_inputField->setEnabled(typing);
+    cell->setPosition({ 0.0f, m_chatHeight });
+    m_chatContainer->addChild(cell);
 
-    if (auto inputNode = m_inputField->getInputNode()) {
-        if (typing) {
-            inputNode->attachWithIME(); 
-        } else {
-            inputNode->detachWithIME(); 
-            this->sendMessage();        
-        }
+    if (!avatarUrl.empty()) {
+        cell->loadDiscordAvatar(cell, avatarUrl);
+    }
+
+    m_chatHeight += 35.0f;
+
+    if (m_chatHeight > 140.0f) {
+        m_chatContainer->setContentSize({ 330.0f, m_chatHeight });
+    } else {
+        m_chatContainer->setContentSize({ 330.0f, 140.0f });
     }
 }
