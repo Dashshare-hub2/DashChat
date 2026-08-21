@@ -18,4 +18,4 @@ private:
 public:
     static ChatOverlay* create(std::string const& roomName);
     void addChatMessage(std::string const& sender, std::string const& text, std::string const& avatarUrl);
-};
+}; 
