@@ -13,11 +13,11 @@ ChatCell* ChatCell::create(std::string const& sender, std::string const& text, c
 }
 
 bool ChatCell::init(std::string const& sender, std::string const& text, cocos2d::ccColor3B color) {
-    if (!CCNode::init()) return false;
+    if (!cocos2d::CCNode::init()) return false;
 
     this->setContentSize({ 300.0f, 30.0f });
 
-    auto senderLabel = CCLabelBMFont::create((sender + ": ").c_str(), "chatFont.fnt");
+    auto senderLabel = cocos2d::CCLabelBMFont::create((sender + ": ").c_str(), "chatFont.fnt");
     if (senderLabel) {
         senderLabel->setAnchorPoint({ 0.0f, 0.5f });
         senderLabel->setPosition({ 35.0f, 15.0f });
@@ -25,7 +25,7 @@ bool ChatCell::init(std::string const& sender, std::string const& text, cocos2d:
         senderLabel->setScale(0.5f);
         this->addChild(senderLabel);
 
-        auto textLabel = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
+        auto textLabel = cocos2d::CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
         if (textLabel) {
             textLabel->setAnchorPoint({ 0.0f, 0.5f });
             textLabel->setPosition({ senderLabel->getPositionX() + senderLabel->getScaledContentSize().width, 15.0f });
@@ -48,11 +48,11 @@ void ChatCell::loadDiscordAvatar(cocos2d::CCNode* parentNode, std::string const&
             if (response.ok()) {
                 auto data = response.data();
                 if (!data.empty() && parentNode) {
-                    auto image = new CCImage();
+                    auto image = new cocos2d::CCImage();
                     if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
-                        auto texture = new CCTexture2D();
+                        auto texture = new cocos2d::CCTexture2D();
                         if (texture->initWithImage(image)) {
-                            auto sprite = CCSprite::createWithTexture(texture);
+                            auto sprite = cocos2d::CCSprite::createWithTexture(texture);
                             if (sprite) {
                                 float scale = 20.0f / sprite->getContentSize().width;
                                 sprite->setScale(scale);

@@ -4,7 +4,7 @@
 
 class ChatCell : public cocos2d::CCNode {
 private:
-    geode::async::TaskHolder<geode::utils::web::WebTask> m_avatarListener;
+    geode::async::TaskHolder<geode::utils::web::WebResponse> m_avatarListener;
 
 public:
     static ChatCell* create(std::string const& sender, std::string const& text, cocos2d::ccColor3B color);
