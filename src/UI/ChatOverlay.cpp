@@ -17,6 +17,7 @@ ChatOverlay* ChatOverlay::create(std::string const& roomName) {
 bool ChatOverlay::setup(std::string const& roomName) {
     this->setTitle("DashChat - " + roomName);
 
+    // 1. Initialize ScrollView
     m_scrollView = cocos2d::extension::CCScrollView::create({ 330.0f, 140.0f });
     m_scrollView->setPosition({ 15.0f, 50.0f });
     m_scrollView->setDirection(cocos2d::extension::kCCScrollViewDirectionVertical);
@@ -25,16 +26,19 @@ bool ChatOverlay::setup(std::string const& roomName) {
     m_scrollView->setContainer(m_chatContainer);
     this->m_mainLayer->addChild(m_scrollView);
 
+    // Background layer
     auto bg = CCScale9Sprite::create("square02_001.png");
     bg->setContentSize({ 330.0f, 140.0f });
     bg->setPosition({ 180.0f, 120.0f });
     bg->setOpacity(100);
     this->m_mainLayer->addChild(bg, -1);
 
+    // 2. Input Box
     m_inputNode = TextInput::create(250.0f, "Type a message...", "chatFont.fnt");
     m_inputNode->setPosition({ 140.0f, 25.0f });
     this->m_mainLayer->addChild(m_inputNode);
 
+    // 3. Send Button
     auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
     auto sendBtn = CCMenuItemSpriteExtra::create(sendBtnSprite, this, menu_selector(ChatOverlay::onSend));
     
@@ -43,6 +47,7 @@ bool ChatOverlay::setup(std::string const& roomName) {
     menu->addChild(sendBtn);
     this->m_mainLayer->addChild(menu);
 
+    // 4. WebSocket Listener Setup
     WebSocketManager::get().connect();
     WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& text, std::string const& avatarUrl) {
         this->addChatMessage(sender, text, avatarUrl);
