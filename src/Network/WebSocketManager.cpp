@@ -9,7 +9,7 @@ WebSocketManager& WebSocketManager::get() {
 }
 
 WebSocketManager::WebSocketManager() {
-    CCScheduler::sharedScheduler()->scheduleSelector(
+    cocos2d::CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
         schedule_selector(WebSocketManager::updateDispatch),
         this, 0.1f, false
     );
@@ -17,6 +17,9 @@ WebSocketManager::WebSocketManager() {
 
 WebSocketManager::~WebSocketManager() {
     disconnect();
+    cocos2d::CCDirector::sharedDirector()->getScheduler()->unscheduleSelector(
+        schedule_selector(WebSocketManager::updateDispatch), this
+    );
 }
 
 void WebSocketManager::connect(std::string const& url) {
@@ -29,12 +32,13 @@ void WebSocketManager::connect(std::string const& url) {
             std::string text = msg->str;
             std::string avatarUrl = "";
 
+            // Matjson parsing API Geode v3+
             auto parseRes = matjson::parse(msg->str);
-            if (parseRes.is_ok()) {
-                auto json = parseRes.unwrap();
-                if (json.contains("sender")) sender = json["sender"].as_string();
-                if (json.contains("text")) text = json["text"].as_string();
-                if (json.contains("avatar")) avatarUrl = json["avatar"].as_string();
+            if (parseRes.has_value()) {
+                auto json = parseRes.value();
+                if (json.contains("sender") && json["sender"].isString()) sender = json["sender"].asString();
+                if (json.contains("text") && json["text"].isString()) text = json["text"].asString();
+                if (json.contains("avatar") && json["avatar"].isString()) avatarUrl = json["avatar"].asString();
             }
 
             std::lock_guard<std::mutex> lock(m_queueMutex);

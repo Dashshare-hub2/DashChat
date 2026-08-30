@@ -26,7 +26,7 @@ public:
     void toggleTyping(bool typing) { 
         m_isTyping = typing; 
         if (m_inputNode) {
-            m_inputNode->setTouchEnabled(typing);
+            m_inputNode->setEnabled(typing);
         }
     }
 };

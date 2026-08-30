@@ -7,7 +7,7 @@
 #include <mutex>
 #include <queue>
 
-class WebSocketManager {
+class WebSocketManager : public cocos2d::CCObject {
 private:
     ix::WebSocket m_webSocket;
     bool m_isConnected = false;
@@ -22,7 +22,7 @@ private:
     std::queue<MessageData> m_messageQueue;
 
     WebSocketManager();
-    ~WebSocketManager();
+    ~WebSocketManager() override;
 
 public:
     static WebSocketManager& get();
@@ -32,5 +32,6 @@ public:
     void send(std::string const& text);
     
     void setOnMessage(std::function<void(std::string const&, std::string const&, std::string const&)> callback);
-    void updateUI(); 
+    void updateUI();
+    void updateDispatch(float dt);
 };
