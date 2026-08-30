@@ -8,58 +8,75 @@ WebSocketManager& WebSocketManager::get() {
     return instance;
 }
 
-void WebSocketManager::connect() {
-    if (m_connected) return;
+WebSocketManager::WebSocketManager() {
+    CCScheduler::sharedScheduler()->scheduleSelector(
+        schedule_selector(WebSocketManager::updateDispatch),
+        this, 0.1f, false
+    );
+}
 
-    std::string baseUrl = Mod::get()->getSettingValue<std::string>("server-url");
-    std::string jwtToken = Mod::get()->getSettingValue<std::string>("user-token");
+WebSocketManager::~WebSocketManager() {
+    disconnect();
+}
 
-    if (baseUrl.empty()) baseUrl = "wss://dashchat-rsuk.onrender.com";
-    if (!jwtToken.empty()) {
-        baseUrl += "?token=" + jwtToken;
-    }
+void WebSocketManager::connect(std::string const& url) {
+    if (m_isConnected) return;
 
-    m_webSocket.setUrl(baseUrl);
+    m_webSocket.setUrl(url);
+    m_webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
+        if (msg->type == ix::WebSocketMessageType::Message) {
+            std::string sender = "User";
+            std::string text = msg->str;
+            std::string avatarUrl = "";
 
-    m_webSocket.setOnMessageCallback([this](const std::unique_ptr<ix::WebSocketMessage>& msg) {
-        if (msg->type == ix::WebSocketMessageType::Open) {
-            m_connected = true;
-            geode::Loader::get()->queueInMainThread([]() {
-                Notification::create("DashChat Authenticated!", NotificationIcon::Success)->show();
-            });
-        } 
-        else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
-            m_connected = false;
-        }
-        else if (msg->type == ix::WebSocketMessageType::Message) {
-            auto parseResult = matjson::parse(msg->str);
-            if (parseResult.isOk()) {
-                auto json = parseResult.unwrap();
-                std::string sender = json["sender"].asString().unwrapOr("Unknown");
-                std::string text = json["text"].asString().unwrapOr("");
-                std::string avatarUrl = json["avatar"].asString().unwrapOr("");
-
-                if (m_onMessageReceived) {
-                    geode::Loader::get()->queueInMainThread([this, sender, text, avatarUrl]() {
-                        m_onMessageReceived(sender, text, avatarUrl);
-                    });
-                }
+            auto parseRes = matjson::parse(msg->str);
+            if (parseRes.is_ok()) {
+                auto json = parseRes.unwrap();
+                if (json.contains("sender")) sender = json["sender"].as_string();
+                if (json.contains("text")) text = json["text"].as_string();
+                if (json.contains("avatar")) avatarUrl = json["avatar"].as_string();
             }
+
+            std::lock_guard<std::mutex> lock(m_queueMutex);
+            m_messageQueue.push({ sender, text, avatarUrl });
+        } else if (msg->type == ix::WebSocketMessageType::Open) {
+            m_isConnected = true;
+        } else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
+            m_isConnected = false;
         }
     });
 
     m_webSocket.start();
 }
 
-void WebSocketManager::setOnMessage(std::function<void(std::string const&, std::string const&, std::string const&)> callback) {
-    m_onMessageReceived = callback;
+void WebSocketManager::disconnect() {
+    if (m_isConnected) {
+        m_webSocket.stop();
+        m_isConnected = false;
+    }
 }
 
 void WebSocketManager::send(std::string const& text) {
-    if (text.empty()) return;
+    if (m_isConnected) {
+        m_webSocket.send(text);
+    }
+}
 
-    matjson::Value json;
-    json["text"] = text;
+void WebSocketManager::setOnMessage(std::function<void(std::string const&, std::string const&, std::string const&)> callback) {
+    m_onMessageCallback = callback;
+}
 
-    m_webSocket.send(json.dump());
+void WebSocketManager::updateUI() {
+    std::lock_guard<std::mutex> lock(m_queueMutex);
+    while (!m_messageQueue.empty()) {
+        auto msg = m_messageQueue.front();
+        m_messageQueue.pop();
+        if (m_onMessageCallback) {
+            m_onMessageCallback(msg.sender, msg.text, msg.avatarUrl);
+        }
+    }
+}
+
+void WebSocketManager::updateDispatch(float dt) {
+    this->updateUI();
 }

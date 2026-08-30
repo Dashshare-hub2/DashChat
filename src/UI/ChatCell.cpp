@@ -1,4 +1,5 @@
 #include "ChatCell.hpp"
+#include <Geode/utils/web.hpp>
 
 using namespace geode::prelude;
 
@@ -13,58 +14,47 @@ ChatCell* ChatCell::create(std::string const& sender, std::string const& text, c
 }
 
 bool ChatCell::init(std::string const& sender, std::string const& text, cocos2d::ccColor3B color) {
-    if (!cocos2d::CCNode::init()) return false;
+    if (!CCNode::init()) return false;
 
-    this->setContentSize({ 300.0f, 30.0f });
+    this->setContentSize({ 320.0f, 30.0f });
 
-    auto senderLabel = cocos2d::CCLabelBMFont::create((sender + ": ").c_str(), "chatFont.fnt");
-    if (senderLabel) {
-        senderLabel->setAnchorPoint({ 0.0f, 0.5f });
-        senderLabel->setPosition({ 35.0f, 15.0f });
-        senderLabel->setColor(color);
-        senderLabel->setScale(0.5f);
-        this->addChild(senderLabel);
+    m_senderLabel = CCLabelBMFont::create((sender + ": ").c_str(), "goldFont.fnt");
+    m_senderLabel->setScale(0.45f);
+    m_senderLabel->setAnchorPoint({ 0.0f, 0.5f });
+    m_senderLabel->setPosition({ 5.0f, 15.0f });
+    this->addChild(m_senderLabel);
 
-        auto textLabel = cocos2d::CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
-        if (textLabel) {
-            textLabel->setAnchorPoint({ 0.0f, 0.5f });
-            textLabel->setPosition({ senderLabel->getPositionX() + senderLabel->getScaledContentSize().width, 15.0f });
-            textLabel->setScale(0.5f);
-            this->addChild(textLabel);
-        }
-    }
+    m_messageLabel = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
+    m_messageLabel->setScale(0.45f);
+    m_messageLabel->setColor(color);
+    m_messageLabel->setAnchorPoint({ 0.0f, 0.5f });
+    m_messageLabel->setPosition({ m_senderLabel->getPositionX() + m_senderLabel->getScaledContentSize().width, 15.0f });
+    this->addChild(m_messageLabel);
 
     return true;
 }
 
-void ChatCell::loadDiscordAvatar(cocos2d::CCNode* parentNode, std::string const& avatarUrl) {
-    if (avatarUrl.empty() || !parentNode) return;
+void ChatCell::loadDiscordAvatar(ChatCell* cell, std::string const& avatarUrl) {
+    if (avatarUrl.empty()) return;
 
-    auto req = web::WebRequest();
-    
-    m_avatarListener.spawn(
-        req.get(avatarUrl),
-        [parentNode](web::WebResponse response) {
-            if (response.ok()) {
-                auto data = response.data();
-                if (!data.empty() && parentNode) {
-                    auto image = new cocos2d::CCImage();
-                    if (image->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
-                        auto texture = new cocos2d::CCTexture2D();
-                        if (texture->initWithImage(image)) {
-                            auto sprite = cocos2d::CCSprite::createWithTexture(texture);
-                            if (sprite) {
-                                float scale = 20.0f / sprite->getContentSize().width;
-                                sprite->setScale(scale);
-                                sprite->setPosition({ 15.0f, 15.0f });
-                                parentNode->addChild(sprite);
-                            }
-                            texture->release();
-                        }
-                        image->release();
+    web::WebRequestReq()
+        .get(avatarUrl)
+        .listen([this](web::WebResponseRes response) {
+            if (response && response->ok()) {
+                auto data = response->data();
+                auto img = new CCImage();
+                if (img->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
+                    auto texture = new CCTexture2D();
+                    if (texture->initWithImage(img)) {
+                        if (m_avatarSprite) m_avatarSprite->removeFromParent();
+                        m_avatarSprite = CCSprite::createWithTexture(texture);
+                        m_avatarSprite->setScale(20.0f / m_avatarSprite->getContentSize().width);
+                        m_avatarSprite->setPosition({ -10.0f, 15.0f });
+                        this->addChild(m_avatarSprite);
                     }
+                    texture->release();
                 }
+                img->release();
             }
-        }
-    );
+        });
 }

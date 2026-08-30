@@ -4,9 +4,12 @@
 
 using namespace geode::prelude;
 
-ChatOverlay* ChatOverlay::create(std::string const& roomName) {
+ChatOverlay* ChatOverlay::create(std::string const& roomName, bool readOnly) {
     auto ret = new ChatOverlay();
-    if (ret && ret->initAnchored(360.0f, 220.0f, roomName)) {
+    float width = 360.0f;
+    float height = readOnly ? 180.0f : 230.0f;
+
+    if (ret && ret->initAnchored(width, height, roomName, readOnly)) {
         ret->autorelease();
         return ret;
     }
@@ -14,40 +17,41 @@ ChatOverlay* ChatOverlay::create(std::string const& roomName) {
     return nullptr;
 }
 
-bool ChatOverlay::setup(std::string const& roomName) {
+bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
+    m_isReadOnly = readOnly;
     this->setTitle("DashChat - " + roomName);
 
-    // 1. Initialize ScrollView
-    m_scrollView = cocos2d::extension::CCScrollView::create({ 330.0f, 140.0f });
-    m_scrollView->setPosition({ 15.0f, 50.0f });
+    float scrollHeight = readOnly ? 130.0f : 140.0f;
+    float scrollPosY = readOnly ? 15.0f : 50.0f;
+
+    m_scrollView = cocos2d::extension::CCScrollView::create({ 330.0f, scrollHeight });
+    m_scrollView->setPosition({ 15.0f, scrollPosY });
     m_scrollView->setDirection(cocos2d::extension::kCCScrollViewDirectionVertical);
     
     m_chatContainer = CCNode::create();
     m_scrollView->setContainer(m_chatContainer);
     this->m_mainLayer->addChild(m_scrollView);
 
-    // Background layer
     auto bg = CCScale9Sprite::create("square02_001.png");
-    bg->setContentSize({ 330.0f, 140.0f });
-    bg->setPosition({ 180.0f, 120.0f });
-    bg->setOpacity(100);
+    bg->setContentSize({ 330.0f, scrollHeight });
+    bg->setPosition({ 180.0f, scrollPosY + (scrollHeight / 2.0f) });
+    bg->setOpacity(80);
     this->m_mainLayer->addChild(bg, -1);
 
-    // 2. Input Box
-    m_inputNode = TextInput::create(250.0f, "Type a message...", "chatFont.fnt");
-    m_inputNode->setPosition({ 140.0f, 25.0f });
-    this->m_mainLayer->addChild(m_inputNode);
+    if (!m_isReadOnly) {
+        m_inputNode = TextInput::create(240.0f, "Type a message...", "chatFont.fnt");
+        m_inputNode->setPosition({ 135.0f, 22.0f });
+        this->m_mainLayer->addChild(m_inputNode);
 
-    // 3. Send Button
-    auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
-    auto sendBtn = CCMenuItemSpriteExtra::create(sendBtnSprite, this, menu_selector(ChatOverlay::onSend));
-    
-    auto menu = CCMenu::create();
-    menu->setPosition({ 300.0f, 25.0f });
-    menu->addChild(sendBtn);
-    this->m_mainLayer->addChild(menu);
+        auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
+        auto sendBtn = CCMenuItemSpriteExtra::create(sendBtnSprite, this, menu_selector(ChatOverlay::onSend));
+        
+        auto menu = CCMenu::create();
+        menu->setPosition({ 295.0f, 22.0f });
+        menu->addChild(sendBtn);
+        this->m_mainLayer->addChild(menu);
+    }
 
-    // 4. WebSocket Listener Setup
     WebSocketManager::get().connect();
     WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& text, std::string const& avatarUrl) {
         this->addChatMessage(sender, text, avatarUrl);
@@ -57,7 +61,7 @@ bool ChatOverlay::setup(std::string const& roomName) {
 }
 
 void ChatOverlay::onSend(cocos2d::CCObject* sender) {
-    if (!m_inputNode) return;
+    if (m_isReadOnly || !m_inputNode) return;
     
     std::string text = m_inputNode->getString();
     if (!text.empty()) {
@@ -77,11 +81,12 @@ void ChatOverlay::addChatMessage(std::string const& sender, std::string const& t
         cell->loadDiscordAvatar(cell, avatarUrl);
     }
 
-    m_chatHeight += 35.0f;
+    m_chatHeight += 32.0f;
+    float minHeight = m_isReadOnly ? 130.0f : 140.0f;
 
-    if (m_chatHeight > 140.0f) {
+    if (m_chatHeight > minHeight) {
         m_chatContainer->setContentSize({ 330.0f, m_chatHeight });
     } else {
-        m_chatContainer->setContentSize({ 330.0f, 140.0f });
+        m_chatContainer->setContentSize({ 330.0f, minHeight });
     }
 }
