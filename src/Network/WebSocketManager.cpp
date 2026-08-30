@@ -32,10 +32,10 @@ void WebSocketManager::connect(std::string const& url) {
             std::string text = msg->str;
             std::string avatarUrl = "";
 
-            // Matjson parsing API Geode v3+
+      
             auto parseRes = matjson::parse(msg->str);
-            if (parseRes.has_value()) {
-                auto json = parseRes.value();
+            if (parseRes.isOk()) {
+                auto json = parseRes.unwrap();
                 if (json.contains("sender") && json["sender"].isString()) sender = json["sender"].asString();
                 if (json.contains("text") && json["text"].isString()) text = json["text"].asString();
                 if (json.contains("avatar") && json["avatar"].isString()) avatarUrl = json["avatar"].asString();
