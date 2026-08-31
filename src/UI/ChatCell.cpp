@@ -1,11 +1,15 @@
 #include "ChatCell.hpp"
-#include <Geode/utils/web.hpp>
 
 using namespace geode::prelude;
 
-ChatCell* ChatCell::create(std::string const& sender, std::string const& text, cocos2d::ccColor3B color) {
+ChatCell* ChatCell::create(
+    std::string const& sender, 
+    std::string const& text, 
+    std::string const& avatarUrl, 
+    cocos2d::ccColor3B color
+) {
     auto ret = new ChatCell();
-    if (ret && ret->init(sender, text, color)) {
+    if (ret && ret->init(sender, text, avatarUrl, color)) {
         ret->autorelease();
         return ret;
     }
@@ -13,52 +17,73 @@ ChatCell* ChatCell::create(std::string const& sender, std::string const& text, c
     return nullptr;
 }
 
-bool ChatCell::init(std::string const& sender, std::string const& text, cocos2d::ccColor3B color) {
+bool ChatCell::init(
+    std::string const& sender, 
+    std::string const& text, 
+    std::string const& avatarUrl, 
+    cocos2d::ccColor3B color
+) {
     if (!CCNode::init()) return false;
 
-    this->setContentSize({ 320.0f, 30.0f });
+    this->setContentSize({350.0f, 40.0f});
 
-    m_senderLabel = CCLabelBMFont::create((sender + ": ").c_str(), "goldFont.fnt");
-    m_senderLabel->setScale(0.45f);
-    m_senderLabel->setAnchorPoint({ 0.0f, 0.5f });
-    m_senderLabel->setPosition({ 5.0f, 15.0f });
-    this->addChild(m_senderLabel);
+    m_avatarSprite = CCSprite::createWithSpriteFrameName("gj_commentIcon_001.png");
+    if (m_avatarSprite) {
+        m_avatarSprite->setPosition({20.0f, 20.0f});
+        m_avatarSprite->setScale(0.8f);
+        this->addChild(m_avatarSprite);
+    }
+
+    m_usernameLabel = CCLabelBMFont::create(sender.c_str(), "goldFont.fnt");
+    if (m_usernameLabel) {
+        m_usernameLabel->setAnchorPoint({0.0f, 0.5f});
+        m_usernameLabel->setPosition({45.0f, 28.0f});
+        m_usernameLabel->setScale(0.5f);
+        m_usernameLabel->setColor(color);
+        this->addChild(m_usernameLabel);
+    }
 
     m_messageLabel = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
-    m_messageLabel->setScale(0.45f);
-    m_messageLabel->setColor(color);
-    m_messageLabel->setAnchorPoint({ 0.0f, 0.5f });
-    m_messageLabel->setPosition({ m_senderLabel->getPositionX() + m_senderLabel->getScaledContentSize().width, 15.0f });
-    this->addChild(m_messageLabel);
+    if (m_messageLabel) {
+        m_messageLabel->setAnchorPoint({0.0f, 0.5f});
+        m_messageLabel->setPosition({45.0f, 12.0f});
+        m_messageLabel->setScale(0.4f);
+        this->addChild(m_messageLabel);
+    }
+
+    if (!avatarUrl.empty()) {
+        this->loadDiscordAvatar(avatarUrl);
+    }
 
     return true;
 }
 
 void ChatCell::loadDiscordAvatar(std::string const& avatarUrl) {
-    if (avatarUrl.empty()) return;
+    m_avatarTask.bind([this](geode::utils::web::WebResponse* res) {
+        if (!res || !res->ok()) return;
 
-    web::WebRequest req;
-    
-    req.get(avatarUrl).listen([this](web::WebResponse* response) {
-        if (!response || !response->ok()) return;
-
-        auto data = response->data();
+        auto data = res->data();
         if (data.empty()) return;
 
-        auto img = new cocos2d::CCImage();
+        auto img = new CCImage();
         if (img->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
-            auto texture = new cocos2d::CCTexture2D();
+            auto texture = new CCTexture2D();
             if (texture->initWithImage(img)) {
                 if (m_avatarSprite) {
-                    m_avatarSprite->removeFromParent();
+                    m_avatarSprite->setTexture(texture);
+                    
+                    auto size = texture->getContentSize();
+                    if (size.width > 0 && size.height > 0) {
+                        m_avatarSprite->setTextureRect(cocos2d::CCRect(0, 0, size.width, size.height));
+                        m_avatarSprite->setScale(30.0f / size.width);
+                    }
                 }
-                m_avatarSprite = cocos2d::CCSprite::createWithTexture(texture);
-                m_avatarSprite->setScale(24.0f / m_avatarSprite->getContentSize().width);
-                m_avatarSprite->setPosition({ 15.0f, 15.0f });
-                this->addChild(m_avatarSprite);
+                texture->release();
             }
-            texture->release();
+            img->release();
         }
-        img->release();
     });
+
+    auto req = geode::utils::web::WebRequest();
+    m_avatarTask.setFilter(req.get(avatarUrl));
 }

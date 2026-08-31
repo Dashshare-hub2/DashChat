@@ -5,7 +5,7 @@ using namespace geode::prelude;
 
 ChatOverlay* ChatOverlay::create(std::string const& roomName, bool readOnly) {
     auto ret = new ChatOverlay();
-    if (ret && ret->init(400.0f, 260.0f, roomName, readOnly)) {
+    if (ret && ret->initAnchored(400.0f, 260.0f, roomName, readOnly)) {
         ret->autorelease();
         return ret;
     }
@@ -54,5 +54,5 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
 }
 
 void ChatOverlay::onSend(CCObject* sender) {
-    FLAlertLayer::create("DashChat", "Sent!!!", "OK")->show();
+    FLAlertLayer::create("DashChat", "Sent!", "OK")->show();
 }
