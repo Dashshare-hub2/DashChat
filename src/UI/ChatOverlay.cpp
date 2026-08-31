@@ -1,15 +1,11 @@
 #include "ChatOverlay.hpp"
 #include "ChatCell.hpp"
-#include "../Network/WebSocketManager.hpp"
 
 using namespace geode::prelude;
 
 ChatOverlay* ChatOverlay::create(std::string const& roomName, bool readOnly) {
     auto ret = new ChatOverlay();
-    float width = 360.0f;
-    float height = readOnly ? 180.0f : 230.0f;
-
-    if (ret && ret->initAnchored(width, height, roomName, readOnly)) {
+    if (ret && ret->initAnchored(400.0f, 260.0f, roomName, readOnly)) {
         ret->autorelease();
         return ret;
     }
@@ -18,103 +14,44 @@ ChatOverlay* ChatOverlay::create(std::string const& roomName, bool readOnly) {
 }
 
 bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
-    m_isReadOnly = readOnly;
-    this->setTitle("DashChat - " + roomName);
+    m_roomName = roomName;
+    m_readOnly = readOnly;
 
-    float scrollHeight = readOnly ? 130.0f : 140.0f;
-    float scrollPosY = readOnly ? 15.0f : 50.0f;
+    this->setTitle("DashChat - " + m_roomName);
 
-    m_scrollView = cocos2d::extension::CCScrollView::create({ 330.0f, scrollHeight });
-    m_scrollView->setPosition({ 15.0f, scrollPosY });
-    m_scrollView->setDirection(cocos2d::extension::kCCScrollViewDirectionVertical);
-    
-    m_chatContainer = CCNode::create();
-    m_scrollView->setContainer(m_chatContainer);
-    this->m_mainLayer->addChild(m_scrollView);
+    auto winSize = m_mainLayer->getContentSize();
 
-    auto bg = CCScale9Sprite::create("square02_001.png");
-    bg->setContentSize({ 330.0f, scrollHeight });
-    bg->setPosition({ 180.0f, scrollPosY + (scrollHeight / 2.0f) });
-    bg->setOpacity(80);
-    this->m_mainLayer->addChild(bg, -1);
+    auto chatContainer = CCNode::create();
+    chatContainer->setPosition({winSize.width / 2.0f, winSize.height / 2.0f + 10.0f});
+    m_mainLayer->addChild(chatContainer);
 
-    if (!m_isReadOnly) {
-        m_inputNode = TextInput::create(240.0f, "Type a message...", "chatFont.fnt");
-        m_inputNode->setPosition({ 135.0f, 22.0f });
-        this->m_mainLayer->addChild(m_inputNode);
-
-        auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
-        auto sendBtn = CCMenuItemSpriteExtra::create(sendBtnSprite, this, menu_selector(ChatOverlay::onSend));
-        
-        auto menu = CCMenu::create();
-        menu->setPosition({ 295.0f, 22.0f });
-        menu->addChild(sendBtn);
-        this->m_mainLayer->addChild(menu);
+    auto demoCell = ChatCell::create(
+        "UserTest", 
+        "Xin chào từ Geode v5!", 
+        "https://cdn.discordapp.com/embed/avatars/0.png"
+    );
+    if (demoCell) {
+        chatContainer->addChild(demoCell);
     }
 
-    WebSocketManager::get().connect("wss://example.com/chat");
-    WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& text, std::string const& avatarUrl) {
-        this->addChatMessage(sender, text, avatarUrl);
-    });
+    if (!m_readOnly) {
+        auto menu = CCMenu::create();
+        menu->setPosition({winSize.width / 2.0f, 30.0f});
+
+        auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
+        auto sendBtn = CCMenuItemSpriteExtra::create(
+            sendBtnSprite,
+            this,
+            menu_selector(ChatOverlay::onSend)
+        );
+
+        menu->addChild(sendBtn);
+        m_mainLayer->addChild(menu);
+    }
 
     return true;
 }
 
-void ChatOverlay::onSend(cocos2d::CCObject* sender) {
-    if (m_isReadOnly || !m_inputNode) return;
-    
-    std::string text = m_inputNode->getString();
-    if (!text.empty()) {
-        WebSocketManager::get().send(text);
-        m_inputNode->setString("");
-    }
-}
-
-void ChatOverlay::addChatMessage(std::string const& sender, std::string const& text, std::string const& avatarUrl) {
-    auto cell = ChatCell::create(sender, text, { 255, 255, 255 });
-    if (!cell) return;
-
-    cell->setPosition({ 0.0f, m_chatHeight });
-    m_chatContainer->addChild(cell);
-
-    if (!avatarUrl.empty()) {
-        cell->loadDiscordAvatar(cell, avatarUrl);
-    }
-
-    m_chatHeight += 32.0f;
-    float minHeight = m_isReadOnly ? 130.0f : 140.0f;
-
-    if (m_chatHeight > minHeight) {
-        m_chatContainer->setContentSize({ 330.0f, m_chatHeight });
-    } else {
-        m_chatContainer->setContentSize({ 330.0f, minHeight });
-    }
-}
-
-void ChatCell::loadDiscordAvatar(ChatCell* cell, std::string const& avatarUrl) {
-    if (avatarUrl.empty()) return;
-
-    web::WebRequest req;
-    req.get(avatarUrl).listen(cell, [this](web::WebResponse* response) {
-        if (!response || !response->ok()) return;
-
-        auto data = response->data();
-        if (data.empty()) return;
-
-        auto img = new cocos2d::CCImage();
-        if (img->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
-            auto texture = new cocos2d::CCTexture2D();
-            if (texture->initWithImage(img)) {
-                if (m_avatarSprite) {
-                    m_avatarSprite->removeFromParent();
-                }
-                m_avatarSprite = cocos2d::CCSprite::createWithTexture(texture);
-                m_avatarSprite->setScale(24.0f / m_avatarSprite->getContentSize().width);
-                m_avatarSprite->setPosition({ 15.0f, 15.0f });
-                this->addChild(m_avatarSprite);
-            }
-            texture->release();
-        }
-        img->release();
-    });
+void ChatOverlay::onSend(CCObject* sender) {
+    FLAlertLayer::create("DashChat", "Sent!!!", "OK")->show();
 }
