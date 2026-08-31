@@ -5,7 +5,7 @@ using namespace geode::prelude;
 
 ChatOverlay* ChatOverlay::create(std::string const& roomName, bool readOnly) {
     auto ret = new ChatOverlay();
-    if (ret && ret->initAnchored(400.0f, 260.0f, roomName, readOnly)) {
+    if (ret && ret->init(400.0f, 260.0f, roomName, readOnly)) {
         ret->autorelease();
         return ret;
     }
@@ -27,8 +27,9 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
 
     auto demoCell = ChatCell::create(
         "UserTest", 
-        "Xin chào từ Geode v5!", 
-        "https://cdn.discordapp.com/embed/avatars/0.png"
+        "Hello Geode!", 
+        "https://cdn.discordapp.com/embed/avatars/0.png",
+        { 255, 255, 255 }
     );
     if (demoCell) {
         chatContainer->addChild(demoCell);

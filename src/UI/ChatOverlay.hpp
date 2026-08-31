@@ -3,12 +3,12 @@
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
 
-class ChatOverlay : public geode::Popup<std::string const&, bool> {
+class ChatOverlay : public geode::Popup {
 protected:
     std::string m_roomName;
     bool m_readOnly;
 
-    bool setup(std::string const& roomName, bool readOnly) override;
+    bool setup(std::string const& roomName, bool readOnly);
     void onSend(cocos2d::CCObject* sender);
 
 public:
