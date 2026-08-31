@@ -32,13 +32,20 @@ void WebSocketManager::connect(std::string const& url) {
             std::string text = msg->str;
             std::string avatarUrl = "";
 
-      
             auto parseRes = matjson::parse(msg->str);
             if (parseRes.isOk()) {
                 auto json = parseRes.unwrap();
-                if (json.contains("sender") && json["sender"].isString()) sender = json["sender"].asString();
-                if (json.contains("text") && json["text"].isString()) text = json["text"].asString();
-                if (json.contains("avatar") && json["avatar"].isString()) avatarUrl = json["avatar"].asString();
+                
+                // Tránh gán geode::Result<std::string> trực tiếp vào std::string
+                if (json.contains("sender") && json["sender"].isString()) {
+                    sender = json["sender"].asString().unwrapOr("User");
+                }
+                if (json.contains("text") && json["text"].isString()) {
+                    text = json["text"].asString().unwrapOr(msg->str);
+                }
+                if (json.contains("avatar") && json["avatar"].isString()) {
+                    avatarUrl = json["avatar"].asString().unwrapOr("");
+                }
             }
 
             std::lock_guard<std::mutex> lock(m_queueMutex);

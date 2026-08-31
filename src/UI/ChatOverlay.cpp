@@ -52,7 +52,7 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
         this->m_mainLayer->addChild(menu);
     }
 
-    WebSocketManager::get().connect();
+    WebSocketManager::get().connect("wss://example.com/chat");
     WebSocketManager::get().setOnMessage([this](std::string const& sender, std::string const& text, std::string const& avatarUrl) {
         this->addChatMessage(sender, text, avatarUrl);
     });

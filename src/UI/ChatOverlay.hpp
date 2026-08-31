@@ -5,7 +5,7 @@
 #include <Geode/ui/TextInput.hpp>
 #include <Geode/cocos/extensions/GUI/CCScrollView/CCScrollView.h>
 
-class ChatOverlay : public geode::Popup<ChatOverlay, std::string const&, bool> {
+class ChatOverlay : public geode::Popup<std::string const&, bool> {
 private:
     cocos2d::CCNode* m_chatContainer = nullptr;
     geode::TextInput* m_inputNode = nullptr;
