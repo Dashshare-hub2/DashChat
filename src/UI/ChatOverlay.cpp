@@ -90,3 +90,31 @@ void ChatOverlay::addChatMessage(std::string const& sender, std::string const& t
         m_chatContainer->setContentSize({ 330.0f, minHeight });
     }
 }
+
+void ChatCell::loadDiscordAvatar(ChatCell* cell, std::string const& avatarUrl) {
+    if (avatarUrl.empty()) return;
+
+    web::WebRequest req;
+    req.get(avatarUrl).listen(cell, [this](web::WebResponse* response) {
+        if (!response || !response->ok()) return;
+
+        auto data = response->data();
+        if (data.empty()) return;
+
+        auto img = new cocos2d::CCImage();
+        if (img->initWithImageData(const_cast<uint8_t*>(data.data()), data.size())) {
+            auto texture = new cocos2d::CCTexture2D();
+            if (texture->initWithImage(img)) {
+                if (m_avatarSprite) {
+                    m_avatarSprite->removeFromParent();
+                }
+                m_avatarSprite = cocos2d::CCSprite::createWithTexture(texture);
+                m_avatarSprite->setScale(24.0f / m_avatarSprite->getContentSize().width);
+                m_avatarSprite->setPosition({ 15.0f, 15.0f });
+                this->addChild(m_avatarSprite);
+            }
+            texture->release();
+        }
+        img->release();
+    });
+}
