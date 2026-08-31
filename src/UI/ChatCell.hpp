@@ -1,7 +1,10 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <Geode/utils/web.hpp>
+#include <Geode/loader/Event.hpp>      
+#include <Geode/utils/web.hpp>         
+#include <Geode/ui/Popup.hpp>
+
 
 class ChatCell : public cocos2d::CCNode {
 private:

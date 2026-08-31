@@ -40,11 +40,10 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
         menu->setPosition({winSize.width / 2.0f, 30.0f});
 
         auto sendBtnSprite = ButtonSprite::create("Send", "goldFont.fnt", "GJ_button_01.png", 0.8f);
-        auto sendBtn = CCMenuItemSpriteExtra::create(
-            sendBtnSprite,
-            this,
-            menu_selector(ChatOverlay::onSend)
-        );
+auto sendBtn = CCMenuItemSpriteExtra::create(
+    sendSprite,
+    this,
+    menu_selector(ChatOverlay::onSend) 
 
         menu->addChild(sendBtn);
         m_mainLayer->addChild(menu);
