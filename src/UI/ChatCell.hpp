@@ -1,10 +1,8 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <Geode/loader/Event.hpp>      
-#include <Geode/utils/web.hpp>         
-#include <Geode/ui/Popup.hpp>
-
+#include <Geode/loader/Event.hpp>
+#include <Geode/utils/web.hpp>
 
 class ChatCell : public cocos2d::CCNode {
 private:
@@ -12,7 +10,7 @@ private:
     cocos2d::CCLabelBMFont* m_usernameLabel = nullptr;
     cocos2d::CCLabelBMFont* m_messageLabel = nullptr;
 
-    geode::EventListener<geode::utils::web::WebTask> m_avatarTask;
+    geode::EventListener<geode::utils::web::WebTask> m_avatarTaskListener;
 
 public:
     static ChatCell* create(
