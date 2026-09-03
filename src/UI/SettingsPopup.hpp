@@ -1,17 +1,12 @@
 #pragma once
-
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
-#include <Geode/ui/TextInput.hpp>
+
+using namespace geode::prelude;
 
 class SettingsPopup : public geode::Popup<> {
-private:
-    geode::TextInput* m_serverInput = nullptr;
-    geode::TextInput* m_firebaseInput = nullptr;
-
+protected:
     bool setup() override;
-    void onSaveAndConnect(cocos2d::CCObject* sender);
-    void onLinkDiscord(cocos2d::CCObject* sender);
 
 public:
     static SettingsPopup* create();

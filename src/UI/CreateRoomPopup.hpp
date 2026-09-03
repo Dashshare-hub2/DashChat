@@ -1,18 +1,15 @@
 #pragma once
-
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
-#include <Geode/ui/TextInput.hpp>
 #include <Geode/utils/web.hpp>
 
-class CreateRoomPopup : public geode::Popup<> {
-private:
-    geode::TextInput* m_roomNameInput = nullptr;
-    geode::TextInput* m_passwordInput = nullptr;
-    geode::EventListener<geode::utils::web::WebTask> m_createRoomTask;
+using namespace geode::prelude;
 
+class CreateRoomPopup : public geode::Popup<> {
+protected:
     bool setup() override;
-    void onCreateRoom(cocos2d::CCObject* sender);
+
+    geode::EventListener<geode::utils::web::WebTask> m_createRoomTask;
 
 public:
     static CreateRoomPopup* create();
