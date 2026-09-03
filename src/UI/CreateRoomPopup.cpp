@@ -13,27 +13,27 @@ CreateRoomPopup* CreateRoomPopup::create() {
 }
 
 bool CreateRoomPopup::setup() {
-    this->setTitle("Tạo Phòng Chat Firebase");
+    this->setTitle("Create Chat Room");
 
     auto winSize = m_mainLayer->getContentSize();
 
-    // Input Tên Phòng
-    m_roomNameInput = TextInput::create(240.0f, "Tên phòng chat...", "chatFont.fnt");
+    // Room Name Input
+    m_roomNameInput = TextInput::create(240.0f, "Room Name...", "chatFont.fnt");
     m_roomNameInput->setPosition({ winSize.width / 2.0f, winSize.height - 65.0f });
     m_roomNameInput->setScale(0.85f);
     m_mainLayer->addChild(m_roomNameInput);
 
-    // Input Mật khẩu phòng (nếu có)
-    m_passwordInput = TextInput::create(240.0f, "Mật khẩu (để trống nếu công khai)", "chatFont.fnt");
+    // Room Password Input
+    m_passwordInput = TextInput::create(240.0f, "Password (Optional)", "chatFont.fnt");
     m_passwordInput->setPosition({ winSize.width / 2.0f, winSize.height - 115.0f });
     m_passwordInput->setScale(0.85f);
     m_mainLayer->addChild(m_passwordInput);
 
-    // Nút Xác nhận Tạo
+    // Create Button
     auto menu = CCMenu::create();
     menu->setPosition({ winSize.width / 2.0f, 30.0f });
 
-    auto createBtnSprite = ButtonSprite::create("Tạo ngay", "goldFont.fnt", "GJ_button_01.png", 0.8f);
+    auto createBtnSprite = ButtonSprite::create("Create", "goldFont.fnt", "GJ_button_01.png", 0.8f);
     auto createBtn = CCMenuItemSpriteExtra::create(
         createBtnSprite,
         this,
@@ -51,7 +51,7 @@ void CreateRoomPopup::onCreateRoom(CCObject* sender) {
     std::string pass = m_passwordInput->getString();
 
     if (roomName.empty()) {
-        FLAlertLayer::create("Lỗi", "Vui lòng nhập tên phòng chat!", "OK")->show();
+        FLAlertLayer::create("Error", "Please enter a valid room name!", "OK")->show();
         return;
     }
 
@@ -66,10 +66,10 @@ void CreateRoomPopup::onCreateRoom(CCObject* sender) {
     m_createRoomTask.bind([this, roomName](web::WebTask::Event* event) {
         if (auto res = event->getValue()) {
             if (res->ok()) {
-                FLAlertLayer::create("Thành công", "Đã tạo phòng chat Firebase: " + roomName, "OK")->show();
+                FLAlertLayer::create("Success", "Room created successfully: " + roomName, "OK")->show();
                 this->onClose(nullptr);
             } else {
-                FLAlertLayer::create("Thất bại", "Không thể tạo phòng chat trên Firebase DB!", "OK")->show();
+                FLAlertLayer::create("Error", "Failed to create room on Firebase DB!", "OK")->show();
             }
         }
     });

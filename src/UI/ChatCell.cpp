@@ -35,7 +35,7 @@ bool ChatCell::init(
         this->addChild(m_avatarSprite);
     }
 
-    // Sender Label
+    // Username Label
     m_usernameLabel = CCLabelBMFont::create(sender.c_str(), "goldFont.fnt");
     if (m_usernameLabel) {
         m_usernameLabel->setAnchorPoint({ 0.0f, 0.5f });

@@ -13,11 +13,12 @@ SettingsPopup* SettingsPopup::create() {
 }
 
 bool SettingsPopup::setup() {
-    this->setTitle("DashChat - Setting");
+    this->setTitle("DashChat - Server Settings");
 
     auto winSize = m_mainLayer->getContentSize();
 
-    auto serverLabel = CCLabelBMFont::create("Server Chat (Render):", "bigFont.fnt");
+    // 1. Render Chat Server URL
+    auto serverLabel = CCLabelBMFont::create("Render Chat Server:", "bigFont.fnt");
     serverLabel->setScale(0.35f);
     serverLabel->setAnchorPoint({0.0f, 0.5f});
     serverLabel->setPosition({ 30.0f, winSize.height - 50.0f });
@@ -30,22 +31,25 @@ bool SettingsPopup::setup() {
     m_serverInput->setScale(0.8f);
     m_mainLayer->addChild(m_serverInput);
 
-    auto fbLabel = CCLabelBMFont::create("Firebase RTDB:", "bigFont.fnt");
+    // 2. Firebase Database URL
+    auto fbLabel = CCLabelBMFont::create("Firebase RTDB URL:", "bigFont.fnt");
     fbLabel->setScale(0.35f);
     fbLabel->setAnchorPoint({0.0f, 0.5f});
     fbLabel->setPosition({ 30.0f, winSize.height - 105.0f });
     m_mainLayer->addChild(fbLabel);
 
     std::string currentFb = Mod::get()->getSavedValue<std::string>("firebase_db_url", "https://dashchat-server-default-rtdb.firebaseio.com");
-    m_firebaseInput = TextInput::create(300.0f, "Firebase Realtime DB URL", "chatFont.fnt");
+    m_firebaseInput = TextInput::create(300.0f, "Firebase DB URL", "chatFont.fnt");
     m_firebaseInput->setString(currentFb);
     m_firebaseInput->setPosition({ winSize.width / 2.0f, winSize.height - 130.0f });
     m_firebaseInput->setScale(0.8f);
     m_mainLayer->addChild(m_firebaseInput);
 
+    // Action Menu
     auto menu = CCMenu::create();
     menu->setPosition({ winSize.width / 2.0f, 30.0f });
 
+    // Link Discord Button
     auto discordBtnSprite = ButtonSprite::create("Discord", "goldFont.fnt", "GJ_button_02.png", 0.7f);
     auto discordBtn = CCMenuItemSpriteExtra::create(
         discordBtnSprite,
@@ -53,7 +57,8 @@ bool SettingsPopup::setup() {
         menu_selector(SettingsPopup::onLinkDiscord)
     );
 
-    auto saveBtnSprite = ButtonSprite::create("Connect", "goldFont.fnt", "GJ_button_01.png", 0.7f);
+    // Save & Connect Button
+    auto saveBtnSprite = ButtonSprite::create("Save & Connect", "goldFont.fnt", "GJ_button_01.png", 0.7f);
     auto saveBtn = CCMenuItemSpriteExtra::create(
         saveBtnSprite,
         this,
@@ -76,7 +81,7 @@ void SettingsPopup::onSaveAndConnect(CCObject* sender) {
     Mod::get()->setSavedValue("chat_server_url", serverUrl);
     Mod::get()->setSavedValue("firebase_db_url", fbUrl);
 
-    FLAlertLayer::create("DashChat", "Saved and Reconnect!", "OK")->show();
+    FLAlertLayer::create("DashChat", "Settings saved successfully! Reconnecting...", "OK")->show();
     this->onClose(nullptr);
 }
 

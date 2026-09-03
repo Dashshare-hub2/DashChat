@@ -1,7 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include "../UI/CreateRoomPopup.hpp"
-#include "../UI/ChatOverlay.hpp"
 
 using namespace geode::prelude;
 

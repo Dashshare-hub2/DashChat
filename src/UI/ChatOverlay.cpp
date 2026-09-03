@@ -22,6 +22,7 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
 
     auto winSize = m_mainLayer->getContentSize();
 
+    // Settings Button in top right corner
     auto topMenu = CCMenu::create();
     topMenu->setPosition({ winSize.width - 25.0f, winSize.height - 25.0f });
 
@@ -37,12 +38,14 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
     }
     m_mainLayer->addChild(topMenu);
 
+    // Chat Container
     m_chatContainer = CCNode::create();
     m_chatContainer->setPosition({ winSize.width / 2.0f, winSize.height / 2.0f + 10.0f });
     m_mainLayer->addChild(m_chatContainer);
 
+    // Demo Cell
     auto demoCell = ChatCell::create(
-        "UserTest", 
+        "System", 
         "Welcome to " + m_roomName, 
         "https://cdn.discordapp.com/embed/avatars/0.png",
         { 0, 255, 128 }
@@ -51,11 +54,12 @@ bool ChatOverlay::setup(std::string const& roomName, bool readOnly) {
         m_chatContainer->addChild(demoCell);
     }
 
+    // Message Input & Send Button
     if (!m_readOnly) {
         auto bottomMenu = CCMenu::create();
         bottomMenu->setPosition({ winSize.width / 2.0f, 25.0f });
 
-        m_messageInput = TextInput::create(280.0f, "Type message...", "chatFont.fnt");
+        m_messageInput = TextInput::create(280.0f, "Type a message...", "chatFont.fnt");
         m_messageInput->setScale(0.75f);
         m_messageInput->setPosition({ -45.0f, 0.0f });
 

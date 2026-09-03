@@ -3,7 +3,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
 #include <Geode/ui/TextInput.hpp>
-#include <Geode/loader/Event.hpp>
 #include <Geode/utils/web.hpp>
 
 class CreateRoomPopup : public geode::Popup<> {
