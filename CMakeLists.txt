@@ -42,6 +42,8 @@ add_library(${MOD_ID} SHARED
     src/UI/ChatCell.cpp
     src/hooks/PlayLayer.cpp
     src/hooks/PauseLayer.cpp
+    src/hooks/MenuLayer.cpp
+    src/UI/SettingsPopup.cpp
 )
 
 setup_geode_mod(${MOD_ID})
